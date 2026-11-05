@@ -1034,9 +1034,15 @@
     });
 
     // Editor content & stats
+    function getNormalizedText() {
+      const raw = editor.innerText.replace(/\r\n/g, '\n');
+      if (raw === '' || raw === '\n') return '';
+      return raw.endsWith('\n') ? raw.slice(0, -1) : raw;
+    }
+
     function checkEmptyState() {
-      const text = editor.innerText.replace(/\r\n/g, '\n');
-      const isEmpty = text === '' || text === '\n';
+      const raw = editor.innerText.replace(/\r\n/g, '\n');
+      const isEmpty = raw === '' || raw === '\n';
       editor.classList.toggle('is-empty', isEmpty);
     }
 
@@ -1053,9 +1059,9 @@
     checkEmptyState();
 
     function updateStats() {
-      const text = editor.innerText.trim();
-      const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
-      const chars = editor.innerText.length;
+      const text = getNormalizedText();
+      const words = text.trim() ? text.trim().split(/\s+/).filter(Boolean).length : 0;
+      const chars = text.length;
       stats.textContent = `${words} word${words === 1 ? '' : 's'} · ${chars} char${chars === 1 ? '' : 's'}`;
     }
 
@@ -1067,7 +1073,9 @@
       const doSave = () => {
         saveTimeout = null;
         try {
-          localStorage.setItem(STORAGE_KEY, editor.innerText);
+          const raw = editor.innerText.replace(/\r\n/g, '\n');
+          const toSave = (raw === '' || raw === '\n') ? '' : editor.innerText;
+          localStorage.setItem(STORAGE_KEY, toSave);
           noteDirty = false;
           noteWriteFailed = false;
           setSaveStatus('Saved', 'saved');
