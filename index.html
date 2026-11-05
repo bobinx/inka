@@ -496,9 +496,9 @@
     #palette-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
       z-index: 200;
       display: flex;
       align-items: flex-start;
@@ -660,6 +660,35 @@
       font-size: 0.68rem;
     }
 
+    /* Toast notification */
+    #toast {
+      position: fixed;
+      top: 1.5rem;
+      left: 50%;
+      transform: translate(-50%, -8px);
+      background: var(--status-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--status-border);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.42rem 0.95rem;
+      border-radius: 9999px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 300;
+      white-space: nowrap;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
     /* Mobile adjustments */
     @media (max-width: 640px) {
       #editor {
@@ -689,6 +718,7 @@
   </style>
 </head>
 <body>
+  <div id="toast" role="status" aria-live="polite"></div>
   <p id="storage-warning" role="status" hidden></p>
   <div
     id="editor"
@@ -1324,36 +1354,112 @@
         desc: 'Strip blank lines from highlighted text',
         keywords: 'clean empty strip blank lines',
         icon: '⌫',
+        allowEmptySelection: false,
         run: (text) => text.split('\n').filter(l => l.trim().length > 0).join('\n')
       },
       {
+        id: 'eval-math',
+        title: 'Evaluate Math Expression',
+        desc: 'Compute highlighted expression and append = result',
+        keywords: 'eval math calculate compute solve expression =',
+        icon: '= ',
+        allowEmptySelection: false,
+        run: (text) => {
+          let expr = text.trim();
+          if (expr.endsWith('=')) {
+            expr = expr.slice(0, -1).trim();
+          }
+          if (!expr) throw new Error('Empty expression');
+
+          // Replace common multiplication and division symbols
+          expr = expr.replace(/×/g, '*').replace(/÷/g, '/');
+
+          // Strict validation: allow numbers, operators, parens, spaces, and Math.*
+          const stripped = expr.replace(/\bMath\.(PI|E|abs|round|floor|ceil|sqrt|cbrt|pow|min|max|sin|cos|tan|log|log10|log2)\b/g, '')
+                               .replace(/[0-9\.\+\-\*\/\%\(\)\,\s]/g, '');
+          if (stripped.length > 0) {
+            throw new Error('Invalid expression characters');
+          }
+
+          const fn = new Function(`"use strict"; return (${expr});`);
+          const val = fn();
+          if (val === undefined || val === null || (typeof val === 'number' && !isFinite(val))) {
+            throw new Error('Invalid calculation result');
+          }
+
+          const trimmed = text.trimEnd();
+          const separator = trimmed.endsWith('=') ? ' ' : ' = ';
+          return `${trimmed}${separator}${val}`;
+        },
+        onError: () => {
+          showToast('Invalid input');
+        }
+      },
+      {
         id: 'gen-uuid',
-        title: 'Replace with UUID v4',
-        desc: 'Replace highlighted text with a random UUID',
-        keywords: 'uuid guid random id generate',
+        title: 'Insert UUID v4',
+        desc: 'Insert random crypto UUID at caret or selection',
+        keywords: 'uuid guid random id generate insert',
         icon: '🆔',
+        allowEmptySelection: true,
         run: () => crypto.randomUUID()
       },
       {
-        id: 'gen-now',
-        title: 'Replace with Current Timestamp',
-        desc: 'Replace highlighted text with ISO timestamp',
-        keywords: 'now timestamp date time today current',
+        id: 'gen-timestamp',
+        title: 'Insert Current Timestamp',
+        desc: 'Insert timestamp (YYYY-MM-DD HH:mm:ss)',
+        keywords: 'now timestamp time current datetime insert',
         icon: '🕒',
-        run: () => new Date().toISOString().replace('T', ' ').slice(0, 16)
+        allowEmptySelection: true,
+        run: () => new Date().toISOString().replace('T', ' ').slice(0, 19)
+      },
+      {
+        id: 'gen-date',
+        title: 'Insert Current Date',
+        desc: 'Insert current date (YYYY-MM-DD)',
+        keywords: 'date today current day calendar insert',
+        icon: '📅',
+        allowEmptySelection: true,
+        run: () => new Date().toISOString().slice(0, 10)
       }
     ];
+
+    let toastTimeout = null;
+    function showToast(message, duration = 2200) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = message;
+      if (toast.classList) {
+        toast.classList.toggle('show', true);
+      }
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        if (toast.classList) {
+          toast.classList.remove('show');
+        }
+      }, duration);
+    }
 
     function saveSelection() {
       const sel = (typeof window !== 'undefined' && window.getSelection) ? window.getSelection() : null;
       if (sel && sel.rangeCount > 0) {
         const range = sel.getRangeAt(0);
-        if (!range.collapsed && editor && editor.contains(range.commonAncestorContainer)) {
-          savedSelectionRange = range.cloneRange();
-          return range.toString();
+        if (range && editor && (editor === range.commonAncestorContainer || (editor.contains && editor.contains(range.commonAncestorContainer)))) {
+          savedSelectionRange = range.cloneRange ? range.cloneRange() : range;
+          return (range.collapsed || typeof range.toString !== 'function') ? '' : range.toString();
         }
       }
-      savedSelectionRange = null;
+      if (editor) {
+        const range = (typeof document !== 'undefined' && document.createRange) ? document.createRange() : null;
+        if (range && range.selectNodeContents && range.collapse) {
+          range.selectNodeContents(editor);
+          range.collapse(false);
+          range.collapsed = true;
+          savedSelectionRange = range.cloneRange ? range.cloneRange() : range;
+        }
+      } else {
+        savedSelectionRange = null;
+      }
       return '';
     }
 
@@ -1421,7 +1527,7 @@
           const len = selectedText.length;
           paletteSelectionStatus.textContent = `Selection: ${len} character${len === 1 ? '' : 's'}`;
         } else {
-          paletteSelectionStatus.textContent = 'No text selected (highlight text to transform)';
+          paletteSelectionStatus.textContent = 'No text selected (insert tools available)';
         }
       }
       if (paletteInput) paletteInput.value = '';
@@ -1449,14 +1555,13 @@
     }
 
     function executeTool(tool) {
-      if (!savedSelectionRange) {
-        // If no text is highlighted, do nothing
-        closePalette();
-        return;
+      let selectedText = '';
+      if (savedSelectionRange && typeof savedSelectionRange.toString === 'function' && !savedSelectionRange.collapsed) {
+        selectedText = savedSelectionRange.toString();
       }
 
-      const selectedText = savedSelectionRange.toString();
-      if (!selectedText) {
+      if (!tool.allowEmptySelection && !selectedText) {
+        // If tool requires selection and no text is highlighted, do nothing
         closePalette();
         return;
       }
@@ -1474,15 +1579,21 @@
 
       try {
         const result = tool.run(selectedText);
-        if (typeof result === 'string' && result !== selectedText) {
-          document.execCommand('insertText', false, result);
+        if (typeof result === 'string') {
+          if (document.execCommand) {
+            document.execCommand('insertText', false, result);
+          }
           noteDirty = true;
           checkEmptyState();
           saveContent();
           updateStats();
         }
       } catch (err) {
-        console.warn('Transformation failed:', err);
+        if (tool.onError) {
+          tool.onError(err);
+        } else if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+          console.warn('Transformation failed:', err);
+        }
       }
 
       // Invalidate savedSelectionRange so it cannot be re-applied
