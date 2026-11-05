@@ -6,46 +6,67 @@
 ╩ ╝╚╝ ╩ ╩ ╩ ╩
 ```
 
-[https://bobinx.github.io/inka/](https://bobinx.github.io/inka/)
+> A quiet, zero-dependency browser scratchpad with developer utilities.
 
-A quiet page that remembers. A browser notepad with no signups and no downloads.
+[![Deploy](https://github.com/bobinx/inka/actions/workflows/deploy.yml/badge.svg)](https://github.com/bobinx/inka/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Views](https://hits.sh/github.com/bobinx/inka.svg?label=views&color=2563eb)](https://hits.sh/github.com/bobinx/inka/)
 
-Inspired by a browser tweak used as a scratchpad:
+[**Open App →**](https://bobinx.github.io/inka/)
+
+---
+
+## Vision
+
+Inka is an ultra-lightweight, self-contained browser notepad inspired by the classic browser scratchpad trick:
 
 ```html
 data:text/html,<body contenteditable style="font:2rem monospace;padding:2rem">
 ```
 
-## How to Use
+It provides an instant, distraction-free writing canvas with local persistence and developer tools. No signups, no external dependencies, and zero build steps.
 
-Drag this link to your bookmarks bar for quick access: [**Inka**](https://bobinx.github.io/inka/)
+---
 
-Or open the page and press <kbd>Cmd</kbd> + <kbd>D</kbd> (Mac) or <kbd>Ctrl</kbd> + <kbd>D</kbd> (Windows/Linux).
+## Features
 
-## Privacy & Storage
+- **Local Storage**: Notes save to browser `localStorage` as you type. Nothing leaves your machine.
+- **Command Palette (`⌘K` / `Ctrl+K`)**: In-place text operations without leaving the editor:
+  - **Case Conversion**: `camelCase`, `snake_case`, `kebab-case`, `Title Case`, `UPPERCASE`, `lowercase`
+  - **Base Conversion**: Decimal ⇄ Hexadecimal, Decimal ⇄ Binary, URL Encode/Decode, Base64 Encode/Decode
+  - **Line Operations**: Alphabetical sort, reverse lines, strip blank lines, remove duplicates
+  - **Math Evaluation**: In-place arithmetic calculation (e.g., `(45 * 12) / 3` appends `= 180`)
+  - **Generators**: Insert UUID v4, ISO timestamp, UTC date, Unix epoch
+- **Plain Text Export (`⌘S` / `Ctrl+S`)**: Download notes anytime as `.txt`.
+- **Appearance Controls**: Light, Dark, and Midnight themes with font size and side margin sliders.
+- **Single-File Architecture**: Self-contained in a single ~40KB `index.html` file.
 
-- **Local storage:** Notes save to browser `localStorage` as you type. Nothing leaves your machine.
-- **No tracking:** Zero cookies, analytics, external scripts, or remote servers.
-- **Works offline:** Fully functional without an internet connection. Makes zero network calls once loaded.
-- **Cross-tab sync:** Notes sync across open tabs and windows in real time.
-- **Plain text export:** Download your note anytime as a `.txt` file with <kbd>Cmd</kbd> / <kbd>Ctrl</kbd> + <kbd>S</kbd>.
-
-If browser storage is blocked or full, Inka shows a warning and keeps editing and download available. Download a backup before closing; unsaved changes are only in the open page. If existing notes cannot be read, Inka won't overwrite them during that visit. Reload to retry reading them.
-
-## Shortcuts
-
-- **Save / Download:** <kbd>Cmd</kbd> / <kbd>Ctrl</kbd> + <kbd>S</kbd>
-- **Indent:** <kbd>Tab</kbd> inserts 4 spaces
-- **Settings:** Click **Settings ⚙** in the bottom bar to adjust theme, font size, and margins
+---
 
 ## Run Locally
 
-Inka is a single self-contained HTML file with no build steps or dependencies:
+Open `index.html` directly in any browser. No build tools, dependencies, or web server needed:
 
 ```bash
 git clone https://github.com/bobinx/inka.git
 open inka/index.html
 ```
+
+---
+
+## Privacy
+
+- **Notes**: Stored strictly in local browser storage (`inka_notes`). No content or keystrokes ever touch a server.
+- **Analytics**: The hosted version on GitHub Pages (`bobinx.github.io/inka`) loads cookie-less [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics/) solely for aggregate visit counts.
+- **Offline / Local**: When run locally or offline, analytics are blocked via a hostname guard and make zero network requests.
+
+---
+
+## Contributing
+
+Contributions and bug reports are welcome. Please open an issue to discuss proposed changes before submitting a pull request. Inka must remain a zero-dependency, self-contained, privacy first single HTML file.
+
+---
 
 ## License
 
