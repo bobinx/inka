@@ -6,13 +6,25 @@
 ╩ ╝╚╝ ╩ ╩ ╩ ╩
 ```
 
-> A quiet, zero-dependency browser scratchpad with developer utilities.
+> A quiet, persistent browser scratchpad with offline developer utilities.  
+> Local-first by design: no accounts, no clouds, and your notes never leave your browser.
 
 [![Deploy](https://github.com/bobinx/inka/actions/workflows/deploy.yml/badge.svg)](https://github.com/bobinx/inka/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Views](https://hits.sh/github.com/bobinx/inka.svg?label=views&color=2563eb)](https://hits.sh/github.com/bobinx/inka/)
 
 [**Open Inka →**](https://bobinx.github.io/inka/) · Drag [**Inka**](https://bobinx.github.io/inka/) to your bookmarks bar for one-click access.
+
+---
+
+## Demo
+
+A clean scratchpad that silently remembers your notes across browser sessions, with an offline `⌘K` palette for in-place formatting, parsing, and calculations:
+
+| Command Palette (`⌘K`) | Appearance & Controls |
+| :---: | :---: |
+| ![Editing text and applying Title Case, JSON Prettify, and Evaluate Math commands](docs/demos/editing-and-commands.gif) | ![Changing Inka's theme, font size, and side margins](docs/demos/appearance-settings.gif) |
+| *In-place formatting, JSON, & calculations* | *Themes, font sizing, & margin controls* |
 
 ---
 
