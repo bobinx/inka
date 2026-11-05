@@ -30,13 +30,17 @@ A clean scratchpad that silently remembers your notes across browser sessions, w
 
 ## Vision
 
-Inka is an ultra-lightweight, self-contained browser notepad inspired by the classic browser scratchpad trick:
+Inka is is inspired by the following classic browser scratchpad trick I have used extensively over the past few years to pull up an editor to organise thoughts and explain stuff:
 
 ```html
+data:text/html,<body contenteditable>
+
+<!-- OR my personal favourite version -->
 data:text/html,<body contenteditable style="font:2rem monospace;padding:2rem">
 ```
+Type it in the address bar and you get an instant text editor. Just one downside, you lose all the notes if you accidentally close the tab.
 
-It provides an instant, distraction-free writing canvas with local persistence and developer tools. No signups, no external dependencies, and zero build steps.
+Inka is built on the same idea. It provides a lightweight, instant, distraction-free writing canvas with added local persistence and a few nifty utilities. No signups, no external dependencies, and zero build steps.
 
 ---
 
