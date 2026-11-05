@@ -1249,9 +1249,9 @@
       },
       {
         id: 'ts-to-utc',
-        title: 'Timestamp to ISO UTC',
-        desc: 'Convert epoch timestamp to ISO 8601 string',
-        keywords: 'timestamp epoch utc iso date time',
+        title: 'Epoch Timestamp to ISO UTC',
+        desc: 'Convert Unix epoch timestamp to ISO 8601 string',
+        keywords: 'timestamp epoch unix utc iso date time',
         icon: '⏱️',
         run: (text) => {
           const num = Number(text.trim());
@@ -1262,8 +1262,8 @@
       },
       {
         id: 'utc-to-ts',
-        title: 'Date to Timestamp',
-        desc: 'Convert ISO date string to Unix timestamp',
+        title: 'ISO Date to Epoch Timestamp',
+        desc: 'Convert ISO date string to Unix epoch timestamp',
         keywords: 'date iso utc to unix epoch timestamp',
         icon: '📅',
         run: (text) => {
@@ -1437,19 +1437,28 @@
         run: () => crypto.randomUUID()
       },
       {
+        id: 'gen-epoch',
+        title: 'Insert Current Epoch Timestamp',
+        desc: 'Insert Unix epoch timestamp in seconds',
+        keywords: 'now timestamp epoch unix seconds time current insert',
+        icon: '⏱️',
+        allowEmptySelection: true,
+        run: () => Math.floor(Date.now() / 1000).toString()
+      },
+      {
         id: 'gen-timestamp',
-        title: 'Insert Current Timestamp',
-        desc: 'Insert timestamp (YYYY-MM-DD HH:mm:ss)',
-        keywords: 'now timestamp time current datetime insert',
+        title: 'Insert Current UTC Timestamp',
+        desc: 'Insert UTC timestamp (YYYY-MM-DD HH:mm:ss)',
+        keywords: 'now timestamp utc time current datetime insert',
         icon: '🕒',
         allowEmptySelection: true,
         run: () => new Date().toISOString().replace('T', ' ').slice(0, 19)
       },
       {
         id: 'gen-date',
-        title: 'Insert Current Date',
-        desc: 'Insert current date (YYYY-MM-DD)',
-        keywords: 'date today current day calendar insert',
+        title: 'Insert Current UTC Date',
+        desc: 'Insert current UTC date (YYYY-MM-DD)',
+        keywords: 'date utc today current day calendar insert',
         icon: '📅',
         allowEmptySelection: true,
         run: () => new Date().toISOString().slice(0, 10)
