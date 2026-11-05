@@ -1,0 +1,923 @@
+<!--
+   ╦  ╦╔═╗╦  ╦  ╦ ╦╔╦╗
+   ╚╗╔╝║╣ ║  ║  ║ ║║║║
+    ╚╝ ╚═╝╩═╝╩═╝╚═╝╩ ╩
+   A quiet page that remembers.
+   No signups, no downloads.
+   Crafted with care by bobinx · https://github.com/bobinx/vellum
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Vellum - A quiet page that remembers. A browser notepad with no signups and no downloads.">
+  <title>Vellum</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
+  <style>
+    :root {
+      --bg: #fafafa;
+      --text: #18181b;
+      --muted: #a1a1aa;
+      --accent: #2563eb;
+      --selection: #bfdbfe;
+      --selection-text: #18181b;
+      --status-bg: rgba(255, 255, 255, 0.92);
+      --status-border: #e4e4e7;
+      --panel-inner-bg: #f4f4f5;
+      --opt-active-bg: #ffffff;
+      --opt-active-text: #18181b;
+      --color-saving: #d97706;
+      --color-saved: #16a34a;
+      --badge-key-bg: #3f3f46;
+      --badge-key-text: #fafafa;
+      --badge-val-bg: #2563eb;
+      --margin-slider: 20;
+      --font-size: 20px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #121214;
+        --text: #e4e4e7;
+        --muted: #71717a;
+        --accent: #60a5fa;
+        --selection: #2563eb;
+        --selection-text: #ffffff;
+        --status-bg: rgba(24, 24, 27, 0.92);
+        --status-border: #27272a;
+        --panel-inner-bg: #1f1f23;
+        --opt-active-bg: #2e2e34;
+        --opt-active-text: #fafafa;
+        --color-saving: #f59e0b;
+        --color-saved: #22c55e;
+        --badge-key-bg: #27272a;
+        --badge-key-text: #d4d4d8;
+        --badge-val-bg: #3b82f6;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #121214;
+      --text: #e4e4e7;
+      --muted: #71717a;
+      --accent: #60a5fa;
+      --selection: #2563eb;
+      --selection-text: #ffffff;
+      --status-bg: rgba(24, 24, 27, 0.92);
+      --status-border: #27272a;
+      --panel-inner-bg: #1f1f23;
+      --opt-active-bg: #2e2e34;
+      --opt-active-text: #fafafa;
+      --color-saving: #f59e0b;
+      --color-saved: #22c55e;
+      --badge-key-bg: #27272a;
+      --badge-key-text: #d4d4d8;
+      --badge-val-bg: #3b82f6;
+    }
+
+    :root[data-theme="midnight"] {
+      --bg: #000000;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --accent: #38bdf8;
+      --selection: #0284c7;
+      --selection-text: #ffffff;
+      --status-bg: rgba(8, 12, 20, 0.92);
+      --status-border: #1e293b;
+      --panel-inner-bg: #0b0f19;
+      --opt-active-bg: #1e293b;
+      --opt-active-text: #f8fafc;
+      --color-saving: #f59e0b;
+      --color-saved: #10b981;
+      --badge-key-bg: #0f172a;
+      --badge-key-text: #94a3b8;
+      --badge-val-bg: #0284c7;
+    }
+
+    :root[data-theme="light"] {
+      --bg: #fafafa;
+      --text: #18181b;
+      --muted: #a1a1aa;
+      --accent: #2563eb;
+      --selection: #bfdbfe;
+      --selection-text: #18181b;
+      --status-bg: rgba(255, 255, 255, 0.92);
+      --status-border: #e4e4e7;
+      --panel-inner-bg: #f4f4f5;
+      --opt-active-bg: #ffffff;
+      --opt-active-text: #18181b;
+      --color-saving: #d97706;
+      --color-saved: #16a34a;
+      --badge-key-bg: #3f3f46;
+      --badge-key-text: #fafafa;
+      --badge-val-bg: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      min-height: 100dvh;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Brand badge inside status bar */
+    #brand-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 18px;
+      border-radius: 3px;
+      overflow: hidden;
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+      font-size: 10px;
+      line-height: 18px;
+      text-decoration: none;
+      user-select: none;
+      opacity: 0.65;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    #brand-badge:hover,
+    #brand-badge:focus-visible {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+
+    #brand-badge .badge-key {
+      background: var(--badge-key-bg);
+      color: var(--badge-key-text);
+      padding: 0 5px;
+      height: 100%;
+      display: inline-flex;
+      align-items: center;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    #brand-badge .badge-val {
+      background: var(--badge-val-bg);
+      color: #ffffff;
+      padding: 0 5px;
+      height: 100%;
+      display: inline-flex;
+      align-items: center;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    #editor {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding-top: 2.5rem;
+      padding-bottom: 7rem;
+      padding-left: clamp(1.25rem, calc(var(--margin-slider, 20) * 1vw), calc(50vw - 140px));
+      padding-right: clamp(1.25rem, calc(var(--margin-slider, 20) * 1vw), calc(50vw - 140px));
+      font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, Monaco, 'Courier New', monospace;
+      font-size: var(--font-size, 20px);
+      line-height: 1.7;
+      letter-spacing: -0.01em;
+      white-space: pre-wrap;
+      word-break: break-word;
+      outline: none;
+      caret-color: var(--accent);
+      border: none;
+      transition: padding-left 0.12s ease-out, padding-right 0.12s ease-out;
+    }
+
+    ::selection,
+    #editor::selection {
+      background-color: var(--selection);
+      color: var(--selection-text);
+    }
+
+    #editor.is-empty::before {
+      content: attr(data-placeholder);
+      color: var(--muted);
+      pointer-events: none;
+      position: absolute;
+      top: 2.5rem;
+      left: clamp(1.25rem, calc(var(--margin-slider, 20) * 1vw), calc(50vw - 140px));
+      right: clamp(1.25rem, calc(var(--margin-slider, 20) * 1vw), calc(50vw - 140px));
+      opacity: 0.7;
+      transition: left 0.12s ease-out, right 0.12s ease-out;
+    }
+
+    /* Settings popover */
+    #settings-panel {
+      position: fixed;
+      bottom: calc(max(1.15rem, env(safe-area-inset-bottom, 1.15rem)) + 3.25rem);
+      left: 50%;
+      transform: translate(-50%, 8px);
+      width: calc(100vw - 1.5rem);
+      max-width: 320px;
+      background: var(--status-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--status-border);
+      border-radius: 14px;
+      padding: 0.95rem 1.05rem;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 0.8rem;
+      color: var(--text);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    #settings-panel.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, 0);
+    }
+
+    .settings-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .theme-segmented {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--panel-inner-bg);
+      border: 1px solid var(--status-border);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .theme-opt {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      padding: 0.38rem 0.15rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .theme-opt:hover {
+      color: var(--text);
+    }
+
+    .theme-opt.active {
+      background: var(--opt-active-bg);
+      color: var(--opt-active-text);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 4px;
+      background: var(--panel-inner-bg);
+      border-radius: 9999px;
+      outline: none;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .panel-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.45rem 0.5rem;
+      background: var(--panel-inner-bg);
+      border: 1px solid var(--status-border);
+      border-radius: 8px;
+      font-size: 0.76rem;
+      color: var(--text);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: inherit;
+      width: 100%;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .panel-btn:hover {
+      background: var(--opt-active-bg);
+    }
+
+    .panel-credit {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--muted);
+      padding-top: 0.4rem;
+      border-top: 1px solid var(--status-border);
+    }
+
+    .panel-credit a {
+      color: var(--muted);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: color 0.15s;
+    }
+
+    .panel-credit a:hover {
+      color: var(--text);
+    }
+
+    /* Status bar */
+    #status-bar {
+      position: fixed;
+      bottom: max(1.15rem, env(safe-area-inset-bottom, 1.15rem));
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.38rem 0.85rem;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      background: var(--status-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--status-border);
+      border-radius: 9999px;
+      user-select: none;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      opacity: 0.6;
+      z-index: 50;
+      white-space: nowrap;
+      width: fit-content;
+      max-width: calc(100vw - 1.5rem);
+    }
+
+    #status-bar:hover,
+    #status-bar:focus-within {
+      opacity: 1;
+      transform: translate(-50%, -2px);
+    }
+
+    .status-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    #save-status.saving {
+      color: var(--color-saving);
+      font-weight: 500;
+    }
+
+    #save-status.saved {
+      color: var(--color-saved);
+      font-weight: 500;
+    }
+
+    #save-status.error {
+      color: var(--color-saving);
+      font-weight: 600;
+    }
+
+    #storage-warning {
+      position: sticky;
+      top: 0;
+      z-index: 110;
+      margin: 0;
+      padding: 0.8rem 1.25rem;
+      border-bottom: 1px solid var(--status-border);
+      background: var(--bg);
+      color: var(--text);
+      font: 0.85rem/1.5 system-ui, sans-serif;
+      text-align: center;
+    }
+
+    .btn-action {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.78rem;
+      padding: 0.2rem 0.15rem;
+      text-decoration: none;
+      transition: color 0.15s;
+      touch-action: manipulation;
+    }
+
+    .btn-action:hover {
+      color: var(--text);
+    }
+
+    #appearance-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .settings-icon {
+      font-size: 0.95rem;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: -1px;
+    }
+
+    .divider {
+      width: 1px;
+      height: 10px;
+      background: var(--status-border);
+      flex-shrink: 0;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 640px) {
+      #editor {
+        padding-top: 2rem;
+        padding-bottom: 6rem;
+      }
+
+      #status-bar {
+        bottom: max(0.85rem, env(safe-area-inset-bottom, 0.85rem));
+        padding: 0.34rem 0.65rem;
+        gap: 0.45rem;
+      }
+
+      #settings-panel {
+        bottom: calc(max(0.85rem, env(safe-area-inset-bottom, 0.85rem)) + 3rem);
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+
+      .settings-icon {
+        font-size: 1.05rem;
+        line-height: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <p id="storage-warning" role="status" hidden></p>
+  <div
+    id="editor"
+    contenteditable="plaintext-only"
+    spellcheck="true"
+    autofocus
+    data-placeholder="Begin anywhere."
+  ></div>
+
+  <!-- Settings Popover -->
+  <div id="settings-panel" aria-label="Settings" role="dialog">
+    <div class="settings-group">
+      <div class="settings-header">
+        <span>Theme</span>
+      </div>
+      <div class="theme-segmented" role="radiogroup" aria-label="Theme selection">
+        <button type="button" class="theme-opt" data-theme-val="auto" role="radio" aria-checked="true" title="System theme">
+          <span>🌓</span> System
+        </button>
+        <button type="button" class="theme-opt" data-theme-val="light" role="radio" aria-checked="false" title="Light theme">
+          <span>☀️</span> Light
+        </button>
+        <button type="button" class="theme-opt" data-theme-val="dark" role="radio" aria-checked="false" title="Dark theme">
+          <span>🌙</span> Dark
+        </button>
+        <button type="button" class="theme-opt" data-theme-val="midnight" role="radio" aria-checked="false" title="Midnight OLED theme">
+          <span>🌑</span> Midnight
+        </button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-header">
+        <span>Font Size</span>
+        <span id="font-size-val-display" style="text-transform: none; font-weight: normal;">20px</span>
+      </div>
+      <div class="slider-container">
+        <input
+          type="range"
+          id="font-size-slider"
+          min="14"
+          max="36"
+          step="1"
+          value="20"
+          aria-label="Font size"
+        >
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-header">
+        <span>Side Margins</span>
+      </div>
+      <div class="slider-container">
+        <input
+          type="range"
+          id="margin-slider"
+          min="3"
+          max="35"
+          step="1"
+          value="20"
+          aria-label="Side margins"
+        >
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-header">
+        <span>About</span>
+      </div>
+      <a href="https://github.com/bobinx/vellum" target="_blank" rel="noopener noreferrer" class="panel-btn">🐙 View on GitHub</a>
+    </div>
+
+    <!-- Creator Credit -->
+    <div class="panel-credit">
+      <span>Crafted by <a href="https://github.com/bobinx" target="_blank" rel="noopener noreferrer">@bobinx</a></span>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div id="status-bar" aria-live="polite">
+    <span class="status-item" id="save-status">Loading...</span>
+    <span class="divider"></span>
+    <span class="status-item" id="stats">0 words</span>
+    <span class="divider"></span>
+    <button class="btn-action" id="download-btn" title="Download note as .txt (Cmd/Ctrl+S)">Download</button>
+    <span class="divider"></span>
+    <button class="btn-action" id="appearance-btn" title="Settings" aria-haspopup="true" aria-expanded="false">
+      <span class="desktop-only">Settings</span>
+      <span class="settings-icon" aria-hidden="true">⚙</span>
+    </button>
+    <span class="divider desktop-only"></span>
+    <a
+      href="https://en.wikipedia.org/wiki/Vellum"
+      target="_blank"
+      rel="noopener noreferrer"
+      id="brand-badge"
+      class="desktop-only"
+      title="Vellum on Wikipedia"
+      aria-label="Vellum on Wikipedia"
+    ><span class="badge-key">vellum</span><span class="badge-val">wiki</span></a>
+  </div>
+
+  <script>
+    // Easter egg
+    console.log(
+      '%c📜 Vellum %c- A quiet page that remembers.\n%cNo signups, no downloads · Stored locally in your browser.\n%cCrafted with care by bobinx · https://github.com/bobinx/vellum',
+      'font-size: 13px; font-weight: bold; color: #2563eb;',
+      'font-size: 12px; color: #71717a;',
+      'font-size: 11px; color: #a1a1aa;',
+      'font-size: 10px; color: #a1a1aa;'
+    );
+
+    const STORAGE_KEY = 'vellum_notes';
+    const THEME_KEY = 'vellum_theme';
+    const MARGIN_KEY = 'vellum_margin';
+    const FONT_SIZE_KEY = 'vellum_font_size';
+
+    const editor = document.getElementById('editor');
+    const saveStatus = document.getElementById('save-status');
+    const stats = document.getElementById('stats');
+    const downloadBtn = document.getElementById('download-btn');
+    const appearanceBtn = document.getElementById('appearance-btn');
+    const settingsPanel = document.getElementById('settings-panel');
+    const marginSlider = document.getElementById('margin-slider');
+    const fontSizeSlider = document.getElementById('font-size-slider');
+    const fontSizeValDisplay = document.getElementById('font-size-val-display');
+    const themeButtons = document.querySelectorAll('.theme-opt');
+    const storageWarning = document.getElementById('storage-warning');
+
+    let noteReadFailed = false;
+    let noteWriteFailed = false;
+    let preferencesFailed = false;
+    let noteDirty = false;
+    let saveTimeout = null;
+    let downloadTimeout = null;
+
+    function updateStorageWarning() {
+      let message = '';
+      if (noteReadFailed) {
+        message = "Couldn't read saved notes. Reload to retry. Download anything you write before closing.";
+      } else if (noteWriteFailed) {
+        message = "Your changes aren't saved in this browser. Download a backup before closing.";
+      } else if (preferencesFailed) {
+        message = "Some settings couldn't be saved. Changes apply only for this visit.";
+      }
+      storageWarning.textContent = message;
+      storageWarning.hidden = !message;
+    }
+
+    function setSaveStatus(text, state) {
+      saveStatus.textContent = text;
+      saveStatus.className = `status-item ${state}`;
+    }
+
+    function readPreference(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch (_) {
+        preferencesFailed = true;
+        updateStorageWarning();
+        return null;
+      }
+    }
+
+    function writePreference(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (_) {
+        preferencesFailed = true;
+        updateStorageWarning();
+      }
+    }
+
+    // Cycle placeholder on new page load
+    const PLACEHOLDERS = [
+      'Begin anywhere.',
+      'The palest ink outlasts the best memory.',
+      'Words fly, what is written remains.',
+      'Paper has more patience than people.'
+    ];
+    const PH_INDEX_KEY = 'vellum_placeholder_index';
+    try {
+      const lastIdx = parseInt(localStorage.getItem(PH_INDEX_KEY), 10);
+      const nextIdx = Number.isInteger(lastIdx) ? (lastIdx + 1) % PLACEHOLDERS.length : 0;
+      localStorage.setItem(PH_INDEX_KEY, nextIdx.toString());
+      editor.setAttribute('data-placeholder', PLACEHOLDERS[nextIdx]);
+    } catch (_) {
+      editor.setAttribute('data-placeholder', PLACEHOLDERS[0]);
+    }
+
+    // Theme
+    let currentTheme = readPreference(THEME_KEY) || 'auto';
+
+    function applyTheme(theme) {
+      currentTheme = theme;
+      if (theme === 'auto') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+
+      themeButtons.forEach((btn) => {
+        const isMatch = btn.getAttribute('data-theme-val') === theme;
+        btn.classList.toggle('active', isMatch);
+        btn.setAttribute('aria-checked', isMatch ? 'true' : 'false');
+      });
+    }
+
+    themeButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const selected = btn.getAttribute('data-theme-val');
+        writePreference(THEME_KEY, selected);
+        applyTheme(selected);
+      });
+    });
+
+    applyTheme(currentTheme);
+
+    // Margins
+    let currentMargin = readPreference(MARGIN_KEY) || '20';
+
+    function applyMargin(val) {
+      currentMargin = val;
+      document.documentElement.style.setProperty('--margin-slider', val);
+      marginSlider.value = val;
+    }
+
+    marginSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      writePreference(MARGIN_KEY, val);
+      applyMargin(val);
+    });
+
+    applyMargin(currentMargin);
+
+    // Font size
+    let currentFontSize = readPreference(FONT_SIZE_KEY) || '20';
+
+    function applyFontSize(val) {
+      currentFontSize = val;
+      document.documentElement.style.setProperty('--font-size', `${val}px`);
+      fontSizeSlider.value = val;
+      fontSizeValDisplay.textContent = `${val}px`;
+    }
+
+    fontSizeSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      writePreference(FONT_SIZE_KEY, val);
+      applyFontSize(val);
+    });
+
+    applyFontSize(currentFontSize);
+
+    // Settings panel
+    appearanceBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = settingsPanel.classList.toggle('open');
+      appearanceBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    settingsPanel.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', () => {
+      if (settingsPanel.classList.contains('open')) {
+        settingsPanel.classList.remove('open');
+        appearanceBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && settingsPanel.classList.contains('open')) {
+        settingsPanel.classList.remove('open');
+        appearanceBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Editor content & stats
+    function checkEmptyState() {
+      const text = editor.innerText.replace(/\r\n/g, '\n');
+      const isEmpty = text === '' || text === '\n';
+      editor.classList.toggle('is-empty', isEmpty);
+    }
+
+    try {
+      const savedContent = localStorage.getItem(STORAGE_KEY);
+      if (savedContent !== null) editor.innerText = savedContent;
+      setSaveStatus('Saved', 'saved');
+    } catch (_) {
+      // An unreadable note is not an empty note. Don't overwrite it this session.
+      noteReadFailed = true;
+      setSaveStatus('Not saved', 'error');
+    }
+    updateStorageWarning();
+    checkEmptyState();
+
+    function updateStats() {
+      const text = editor.innerText.trim();
+      const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+      const chars = editor.innerText.length;
+      stats.textContent = `${words} word${words === 1 ? '' : 's'} · ${chars} char${chars === 1 ? '' : 's'}`;
+    }
+
+    function saveContent(immediate = false) {
+      if (saveTimeout) clearTimeout(saveTimeout);
+      if (noteReadFailed || !noteDirty) return;
+      setSaveStatus('Saving...', 'saving');
+
+      const doSave = () => {
+        saveTimeout = null;
+        try {
+          localStorage.setItem(STORAGE_KEY, editor.innerText);
+          noteDirty = false;
+          noteWriteFailed = false;
+          setSaveStatus('Saved', 'saved');
+        } catch (_) {
+          noteWriteFailed = true;
+          setSaveStatus('Not saved', 'error');
+        }
+        updateStorageWarning();
+      };
+
+      if (immediate) {
+        doSave();
+      } else {
+        saveTimeout = setTimeout(doSave, 250);
+      }
+    }
+
+    editor.addEventListener('input', () => {
+      noteDirty = true;
+      checkEmptyState();
+      saveContent();
+      updateStats();
+    });
+
+    editor.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        document.execCommand('insertText', false, '    ');
+        noteDirty = true;
+        checkEmptyState();
+        saveContent();
+        updateStats();
+      }
+
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        saveContent(true);
+        downloadNote();
+      }
+    });
+
+    editor.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const text = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+      document.execCommand('insertText', false, text);
+      noteDirty = true;
+      checkEmptyState();
+      saveContent();
+      updateStats();
+    });
+
+    // Cross-tab sync
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY && !noteReadFailed && !noteWriteFailed && e.newValue !== editor.innerText) {
+        editor.innerText = e.newValue || '';
+        noteDirty = false;
+        checkEmptyState();
+        updateStats();
+      }
+      if (e.key === THEME_KEY && e.newValue !== currentTheme) {
+        applyTheme(e.newValue || 'auto');
+      }
+      if (e.key === MARGIN_KEY && e.newValue !== currentMargin) {
+        applyMargin(e.newValue || '20');
+      }
+      if (e.key === FONT_SIZE_KEY && e.newValue !== currentFontSize) {
+        applyFontSize(e.newValue || '20');
+      }
+    });
+
+    window.addEventListener('beforeunload', () => saveContent(true));
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') saveContent(true);
+    });
+
+    function downloadNote() {
+      const blob = new Blob([editor.innerText], { type: 'text/plain;charset=utf-8' });
+      const now = new Date();
+      const timestamp = now.toISOString().slice(0, 10);
+      const filename = `vellum-${timestamp}.txt`;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      // Export success says nothing about whether browser storage succeeded.
+      downloadBtn.textContent = 'Downloaded';
+      if (downloadTimeout) clearTimeout(downloadTimeout);
+      downloadTimeout = setTimeout(() => {
+        downloadBtn.textContent = 'Download';
+      }, 2000);
+    }
+
+    downloadBtn.addEventListener('click', downloadNote);
+
+    updateStats();
+    editor.focus();
+
+    if (editor.innerText.length > 0) {
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(editor);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  </script>
+</body>
+</html>
