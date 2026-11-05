@@ -147,7 +147,7 @@
       line-height: 18px;
       text-decoration: none;
       user-select: none;
-      opacity: 0.65;
+      opacity: 0.85;
       transition: opacity 0.15s ease, transform 0.15s ease;
       vertical-align: middle;
       flex-shrink: 0;
@@ -355,16 +355,16 @@
       padding: 0.38rem 0.85rem;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 0.78rem;
-      color: var(--muted);
+      color: var(--text);
       background: var(--status-bg);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid var(--status-border);
       border-radius: 9999px;
       user-select: none;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      opacity: 0.6;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      opacity: 1;
       z-index: 50;
       white-space: nowrap;
       width: fit-content;
@@ -373,14 +373,18 @@
 
     #status-bar:hover,
     #status-bar:focus-within {
-      opacity: 1;
       transform: translate(-50%, -2px);
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.12);
     }
 
     .status-item {
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
+    }
+
+    #stats {
+      color: var(--muted);
     }
 
     #save-status.saving {
@@ -414,17 +418,19 @@
     .btn-action {
       background: none;
       border: none;
-      color: var(--muted);
+      color: var(--text);
+      opacity: 0.82;
       cursor: pointer;
       font-size: 0.78rem;
       padding: 0.2rem 0.15rem;
       text-decoration: none;
-      transition: color 0.15s;
+      transition: opacity 0.15s ease, color 0.15s ease;
       touch-action: manipulation;
     }
 
     .btn-action:hover {
-      color: var(--text);
+      opacity: 1;
+      color: var(--accent);
     }
 
     #appearance-btn {
@@ -460,14 +466,16 @@
       border: 1px solid var(--status-border);
       line-height: 1.1;
       font-weight: 500;
-      color: var(--muted);
+      color: var(--text);
+      opacity: 0.85;
       transition: all 0.15s ease;
     }
 
     #palette-btn:hover .cmd-badge,
     #palette-btn:focus-visible .cmd-badge {
-      color: var(--text);
-      border-color: var(--muted);
+      opacity: 1;
+      color: var(--accent);
+      border-color: var(--accent);
     }
 
     /* Command Palette Modal */
