@@ -1,21 +1,16 @@
-<!--
-   ╦ ╔╗╔ ╦╔═ ╔═╗
-   ║ ║║║ ╠╩╗ ╠═╣
-   ╩ ╝╚╝ ╩ ╩ ╩ ╩
-   A quiet page that remembers.
-   No signups, no downloads.
-   Crafted with care by bobinx · https://github.com/bobinx/inka
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Inka - A quiet page that remembers. A browser notepad with no signups and no downloads.">
-  <title>Inka</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cstyle%3Epath{fill:%2318181b}@media(prefers-color-scheme:dark){path{fill:%23f4f4f5}}%3C/style%3E%3Cpath d='M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z'/%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Inka - A quiet page that remembers</title>
+  <meta name="description" content="A minimalist, zero-latency scratchpad and developer toolbox for browser tabs. No accounts, no clouds, instant offline local storage.">
+  <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121214" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2318181b'/%3E%3Cpath d='M9 8h4.5v16H9zM18.5 8H23v16h-4.5z' fill='%23fafafa'/%3E%3Cpath d='M9 8h14v3.5H9z' fill='%23fafafa'/%3E%3C/svg%3E">
   <style>
-    :root {
+    :root,
+    :root[data-theme="light"] {
       --bg: #fafafa;
       --text: #18181b;
       --muted: #a1a1aa;
@@ -34,10 +29,13 @@
       --badge-val-bg: #2563eb;
       --margin-slider: 20;
       --font-size: 20px;
+      --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, Monaco, monospace;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --editor-pad-x: clamp(1.25rem, calc(var(--margin-slider, 20) * 1vw), calc(50vw - 140px));
     }
 
     @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
+      :root:not([data-theme="light"]):not([data-theme="midnight"]) {
         --bg: #121214;
         --text: #e4e4e7;
         --muted: #71717a;
@@ -95,25 +93,6 @@
       --badge-val-bg: #0284c7;
     }
 
-    :root[data-theme="light"] {
-      --bg: #fafafa;
-      --text: #18181b;
-      --muted: #a1a1aa;
-      --accent: #2563eb;
-      --selection: #93c5fd;
-      --selection-text: #18181b;
-      --status-bg: rgba(255, 255, 255, 0.92);
-      --status-border: #e4e4e7;
-      --panel-inner-bg: #f4f4f5;
-      --opt-active-bg: #ffffff;
-      --opt-active-text: #18181b;
-      --color-saving: #b45309;
-      --color-saved: #15803d;
-      --badge-key-bg: #3f3f46;
-      --badge-key-text: #fafafa;
-      --badge-val-bg: #2563eb;
-    }
-
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -142,7 +121,7 @@
       height: 18px;
       border-radius: 3px;
       overflow: hidden;
-      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 10px;
       line-height: 18px;
       text-decoration: none;
@@ -189,9 +168,9 @@
       min-height: 100dvh;
       padding-top: 2.5rem;
       padding-bottom: 7rem;
-      padding-left: clamp(1.25rem, calc(var(--margin-slider, 20) * 1vw), calc(50vw - 140px));
-      padding-right: clamp(1.25rem, calc(var(--margin-slider, 20) * 1vw), calc(50vw - 140px));
-      font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, Monaco, 'Courier New', monospace;
+      padding-left: var(--editor-pad-x);
+      padding-right: var(--editor-pad-x);
+      font-family: var(--font-mono);
       font-size: var(--font-size, 20px);
       line-height: 1.7;
       letter-spacing: -0.01em;
@@ -215,8 +194,8 @@
       pointer-events: none;
       position: absolute;
       top: 2.5rem;
-      left: clamp(1.25rem, calc(var(--margin-slider, 20) * 1vw), calc(50vw - 140px));
-      right: clamp(1.25rem, calc(var(--margin-slider, 20) * 1vw), calc(50vw - 140px));
+      left: var(--editor-pad-x);
+      right: var(--editor-pad-x);
       opacity: 0.7;
       transition: left 0.12s ease-out, right 0.12s ease-out;
     }
@@ -239,7 +218,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.85rem;
-      font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, Monaco, 'Courier New', monospace;
+      font-family: var(--font-mono);
       font-size: 0.8rem;
       color: var(--text);
       z-index: 100;
@@ -330,6 +309,7 @@
       align-items: center;
     }
 
+    /* Range Slider */
     input[type="range"] {
       -webkit-appearance: none;
       appearance: none;
@@ -343,11 +323,20 @@
       padding: 0;
     }
 
-    input[type="range"]:focus-visible {
-      outline: none;
+    input[type="range"]:hover {
+      --thumb-scale: scale(1.15);
+      --thumb-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     }
 
-    /* Track: WebKit / Blink */
+    input[type="range"]:active {
+      --thumb-scale: scale(1.05);
+      --thumb-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    input[type="range"]:focus-visible {
+      --thumb-shadow: 0 0 0 2px var(--status-bg), 0 0 0 4px var(--accent);
+    }
+
     input[type="range"]::-webkit-slider-runnable-track {
       width: 100%;
       height: 4px;
@@ -358,7 +347,6 @@
       cursor: pointer;
     }
 
-    /* Thumb: WebKit / Blink */
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -367,28 +355,14 @@
       border-radius: 50%;
       background: var(--accent);
       border: 2px solid var(--opt-active-bg);
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--thumb-shadow, 0 1px 4px rgba(0, 0, 0, 0.2));
       cursor: pointer;
       margin-top: -5px;
       box-sizing: border-box;
+      transform: var(--thumb-scale, none);
       transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
 
-    input[type="range"]:hover::-webkit-slider-thumb {
-      transform: scale(1.15);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-    }
-
-    input[type="range"]:active::-webkit-slider-thumb {
-      transform: scale(1.05);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-
-    input[type="range"]:focus-visible::-webkit-slider-thumb {
-      box-shadow: 0 0 0 2px var(--status-bg), 0 0 0 4px var(--accent);
-    }
-
-    /* Track: Firefox */
     input[type="range"]::-moz-range-track {
       width: 100%;
       height: 4px;
@@ -399,35 +373,20 @@
       cursor: pointer;
     }
 
-    /* Thumb: Firefox */
     input[type="range"]::-moz-range-thumb {
       width: 14px;
       height: 14px;
       border-radius: 50%;
       background: var(--accent);
       border: 2px solid var(--opt-active-bg);
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--thumb-shadow, 0 1px 4px rgba(0, 0, 0, 0.2));
       cursor: pointer;
       box-sizing: border-box;
       border-style: solid;
+      transform: var(--thumb-scale, none);
       transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
 
-    input[type="range"]:hover::-moz-range-thumb {
-      transform: scale(1.15);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-    }
-
-    input[type="range"]:active::-moz-range-thumb {
-      transform: scale(1.05);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-
-    input[type="range"]:focus-visible::-moz-range-thumb {
-      box-shadow: 0 0 0 2px var(--status-bg), 0 0 0 4px var(--accent);
-    }
-
-    /* Remove Firefox dotted outline */
     input[type="range"]::-moz-focus-outer {
       border: 0;
     }
@@ -461,7 +420,7 @@
       align-items: center;
       gap: 0.65rem;
       padding: 0.32rem 0.5rem 0.32rem 0.75rem;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: var(--font-sans);
       font-size: 0.78rem;
       color: var(--text);
       background: var(--status-bg);
@@ -572,7 +531,7 @@
       border-bottom: 1px solid var(--status-border);
       background: var(--bg);
       color: var(--text);
-      font: 0.85rem/1.5 system-ui, sans-serif;
+      font: 0.85rem/1.5 var(--font-sans);
       text-align: center;
     }
 
@@ -641,7 +600,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       font-size: 0.72rem;
       padding: 0.12rem 0.35rem;
       border-radius: 4px;
@@ -697,7 +656,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: var(--font-sans);
       transform: translateY(-4px);
       transition: transform 0.15s ease;
     }
@@ -772,7 +731,7 @@
       justify-content: center;
       font-size: 0.68rem;
       letter-spacing: -0.01em;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-family: var(--font-mono);
       font-weight: 600;
       color: var(--accent);
       background: var(--panel-inner-bg);
@@ -827,7 +786,7 @@
     }
 
     .palette-footer kbd {
-      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-family: var(--font-mono);
       padding: 0.08rem 0.28rem;
       background: var(--opt-active-bg);
       border: 1px solid var(--status-border);
@@ -846,7 +805,7 @@
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid var(--status-border);
       color: var(--text);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: var(--font-sans);
       font-size: 0.8rem;
       font-weight: 500;
       padding: 0.42rem 0.95rem;
@@ -1068,24 +1027,27 @@
     const THEME_KEY = 'inka_theme';
     const MARGIN_KEY = 'inka_margin';
     const FONT_SIZE_KEY = 'inka_font_size';
+    const PH_INDEX_KEY = 'inka_placeholder_index';
 
-    const editor = document.getElementById('editor');
-    const saveStatus = document.getElementById('save-status');
-    const stats = document.getElementById('stats');
-    const downloadBtn = document.getElementById('download-btn');
-    const appearanceBtn = document.getElementById('appearance-btn');
-    const settingsPanel = document.getElementById('settings-panel');
-    const marginSlider = document.getElementById('margin-slider');
-    const fontSizeSlider = document.getElementById('font-size-slider');
-    const fontSizeValDisplay = document.getElementById('font-size-val-display');
+    const $ = (id) => document.getElementById(id);
+    const editor = $('editor');
+    const saveStatus = $('save-status');
+    const stats = $('stats');
+    const downloadBtn = $('download-btn');
+    const appearanceBtn = $('appearance-btn');
+    const settingsPanel = $('settings-panel');
+    const marginSlider = $('margin-slider');
+    const fontSizeSlider = $('font-size-slider');
+    const fontSizeValDisplay = $('font-size-val-display');
     const themeButtons = document.querySelectorAll('.theme-opt');
-    const storageWarning = document.getElementById('storage-warning');
-    const paletteBtn = document.getElementById('palette-btn');
-    const paletteBackdrop = document.getElementById('palette-backdrop');
-    const paletteInput = document.getElementById('palette-input');
-    const paletteList = document.getElementById('palette-list');
-    const paletteHintText = document.getElementById('palette-hint-text');
-    const paletteSelectionStatus = document.getElementById('palette-selection-status');
+    const storageWarning = $('storage-warning');
+    const paletteBtn = $('palette-btn');
+    const paletteBackdrop = $('palette-backdrop');
+    const paletteInput = $('palette-input');
+    const paletteList = $('palette-list');
+    const paletteHintText = $('palette-hint-text');
+    const paletteSelectionStatus = $('palette-selection-status');
+    const toastEl = $('toast');
 
     let noteReadFailed = false;
     let noteWriteFailed = false;
@@ -1093,6 +1055,7 @@
     let noteDirty = false;
     let saveTimeout = null;
     let downloadTimeout = null;
+    let toastTimeout = null;
 
     function updateStorageWarning() {
       let message = '';
@@ -1131,14 +1094,23 @@
       }
     }
 
-    // Cycle placeholder on new page load
+    function showToast(message, duration = 2200) {
+      if (!toastEl) return;
+      toastEl.textContent = message;
+      toastEl.classList?.toggle('show', true);
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toastEl.classList?.remove('show');
+      }, duration);
+    }
+
+    // Placeholders
     const PLACEHOLDERS = [
       'Begin anywhere.',
       'The palest ink outlasts the best memory.',
       'Words fly, what is written remains.',
       'Paper has more patience than people.'
     ];
-    const PH_INDEX_KEY = 'inka_placeholder_index';
     try {
       const lastIdx = parseInt(localStorage.getItem(PH_INDEX_KEY), 10);
       const nextIdx = Number.isInteger(lastIdx) ? (lastIdx + 1) % PLACEHOLDERS.length : 0;
@@ -1158,7 +1130,6 @@
       } else {
         document.documentElement.setAttribute('data-theme', theme);
       }
-
       themeButtons.forEach((btn) => {
         const isMatch = btn.getAttribute('data-theme-val') === theme;
         btn.classList.toggle('active', isMatch);
@@ -1178,75 +1149,57 @@
 
     // Margins
     let currentMargin = readPreference(MARGIN_KEY) || '20';
-
     function applyMargin(val) {
       currentMargin = val;
       document.documentElement.style.setProperty('--margin-slider', val);
       marginSlider.value = val;
     }
-
     marginSlider.addEventListener('input', (e) => {
-      const val = e.target.value;
-      writePreference(MARGIN_KEY, val);
-      applyMargin(val);
+      writePreference(MARGIN_KEY, e.target.value);
+      applyMargin(e.target.value);
     });
-
     applyMargin(currentMargin);
 
     // Font size
     let currentFontSize = readPreference(FONT_SIZE_KEY) || '20';
-
     function applyFontSize(val) {
       currentFontSize = val;
       document.documentElement.style.setProperty('--font-size', `${val}px`);
       fontSizeSlider.value = val;
       fontSizeValDisplay.textContent = `${val}px`;
     }
-
     fontSizeSlider.addEventListener('input', (e) => {
-      const val = e.target.value;
-      writePreference(FONT_SIZE_KEY, val);
-      applyFontSize(val);
+      writePreference(FONT_SIZE_KEY, e.target.value);
+      applyFontSize(e.target.value);
     });
-
     applyFontSize(currentFontSize);
 
     // Settings panel
+    function toggleSettings(open = !settingsPanel.classList.contains('open')) {
+      settingsPanel.classList.toggle('open', open);
+      appearanceBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
     appearanceBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isOpen = settingsPanel.classList.toggle('open');
-      appearanceBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      toggleSettings();
     });
 
-    settingsPanel.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-
-    document.addEventListener('click', () => {
-      if (settingsPanel.classList.contains('open')) {
-        settingsPanel.classList.remove('open');
-        appearanceBtn.setAttribute('aria-expanded', 'false');
-      }
-    });
-
+    settingsPanel.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', () => toggleSettings(false));
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && settingsPanel.classList.contains('open')) {
-        settingsPanel.classList.remove('open');
-        appearanceBtn.setAttribute('aria-expanded', 'false');
-      }
+      if (e.key === 'Escape' && settingsPanel.classList.contains('open')) toggleSettings(false);
     });
 
     // Editor content & stats
     function getNormalizedText() {
       const raw = editor.innerText.replace(/\r\n/g, '\n');
-      if (raw === '' || raw === '\n') return '';
-      return raw.endsWith('\n') ? raw.slice(0, -1) : raw;
+      return (raw === '' || raw === '\n') ? '' : (raw.endsWith('\n') ? raw.slice(0, -1) : raw);
     }
 
     function checkEmptyState() {
       const raw = editor.innerText.replace(/\r\n/g, '\n');
-      const isEmpty = raw === '' || raw === '\n';
-      editor.classList.toggle('is-empty', isEmpty);
+      editor.classList.toggle('is-empty', raw === '' || raw === '\n');
     }
 
     try {
@@ -1254,49 +1207,43 @@
       if (savedContent !== null) editor.innerText = savedContent;
       setSaveStatus('Saved', 'saved');
     } catch (_) {
-      // An unreadable note is not an empty note. Don't overwrite it this session.
       noteReadFailed = true;
       setSaveStatus('Not saved', 'error');
     }
     updateStorageWarning();
     checkEmptyState();
 
-    // History Manager for Undo / Redo (cross-browser, fully reliable in Safari, Brave, Chrome, Firefox)
+    // History Manager (Safari/Brave undo stack)
     const historyStack = [];
     let historyIndex = -1;
     const MAX_HISTORY = 100;
     let historyDebounceTimeout = null;
 
     function getSelectionOffsets(el) {
-      if (typeof window === 'undefined' || !window.getSelection || !el) return { start: 0, end: 0 };
-      const sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0) return { start: 0, end: 0 };
+      const sel = window.getSelection?.();
+      if (!sel || sel.rangeCount === 0 || !el) return { start: 0, end: 0 };
       try {
         const range = sel.getRangeAt(0);
-        if (!range || (el !== range.commonAncestorContainer && (!el.contains || !el.contains(range.commonAncestorContainer)))) {
+        if (!range || (el !== range.commonAncestorContainer && !el.contains?.(range.commonAncestorContainer))) {
           return { start: 0, end: 0 };
         }
-        if (!range.cloneRange || typeof document === 'undefined') return { start: 0, end: 0 };
         const preStart = range.cloneRange();
         preStart.selectNodeContents(el);
         preStart.setEnd(range.startContainer, range.startOffset);
-        const start = preStart.toString().length;
 
         const preEnd = range.cloneRange();
         preEnd.selectNodeContents(el);
         preEnd.setEnd(range.endContainer, range.endOffset);
-        const end = preEnd.toString().length;
 
-        return { start, end };
+        return { start: preStart.toString().length, end: preEnd.toString().length };
       } catch (_) {
         return { start: 0, end: 0 };
       }
     }
 
     function setSelectionOffsets(el, start, end) {
-      if (typeof window === 'undefined' || !window.getSelection || typeof document === 'undefined' || !document.createRange || !el) return;
-      const sel = window.getSelection();
-      if (!sel) return;
+      const sel = window.getSelection?.();
+      if (!sel || !el || !document.createRange) return;
       try {
         const range = document.createRange();
         let current = 0;
@@ -1317,9 +1264,7 @@
             }
             current = next;
           } else if (node.childNodes) {
-            for (let i = 0; i < node.childNodes.length; i++) {
-              walk(node.childNodes[i]);
-            }
+            for (let i = 0; i < node.childNodes.length; i++) walk(node.childNodes[i]);
           }
         }
         walk(el);
@@ -1327,15 +1272,26 @@
         if (startNode && endNode) {
           range.setStart(startNode, startOffset);
           range.setEnd(endNode, endOffset);
-        } else if (range.selectNodeContents && range.collapse) {
+        } else {
           range.selectNodeContents(el);
           range.collapse(false);
         }
-        if (sel.removeAllRanges && sel.addRange) {
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
+        sel.removeAllRanges();
+        sel.addRange(range);
       } catch (_) {}
+    }
+
+    function flushDebouncedHistory() {
+      if (historyDebounceTimeout) {
+        clearTimeout(historyDebounceTimeout);
+        historyDebounceTimeout = null;
+        const currentText = editor.innerText;
+        if (historyIndex >= 0 && historyStack[historyIndex] && historyStack[historyIndex].text !== currentText) {
+          const offsets = getSelectionOffsets(editor);
+          historyStack.push({ text: currentText, start: offsets.start, end: offsets.end });
+          historyIndex = historyStack.length - 1;
+        }
+      }
     }
 
     function pushHistory(immediate = false) {
@@ -1344,7 +1300,7 @@
       const offsets = getSelectionOffsets(editor);
 
       const doPush = () => {
-        if (historyIndex >= 0 && historyStack[historyIndex] && historyStack[historyIndex].text === currentText) {
+        if (historyIndex >= 0 && historyStack[historyIndex]?.text === currentText) {
           historyStack[historyIndex].start = offsets.start;
           historyStack[historyIndex].end = offsets.end;
           return;
@@ -1353,9 +1309,7 @@
           historyStack.splice(historyIndex + 1);
         }
         historyStack.push({ text: currentText, start: offsets.start, end: offsets.end });
-        if (historyStack.length > MAX_HISTORY) {
-          historyStack.shift();
-        }
+        if (historyStack.length > MAX_HISTORY) historyStack.shift();
         historyIndex = historyStack.length - 1;
       };
 
@@ -1374,56 +1328,39 @@
       }
     }
 
+    function restoreHistoryState(state) {
+      editor.innerText = state.text;
+      editor.focus?.();
+      setSelectionOffsets(editor, state.start, state.end);
+      noteDirty = true;
+      checkEmptyState();
+      saveContent();
+      updateStats();
+    }
+
     function undo() {
       if (!editor) return false;
-      if (historyDebounceTimeout) {
-        clearTimeout(historyDebounceTimeout);
-        historyDebounceTimeout = null;
-        const currentText = editor.innerText;
-        if (historyIndex >= 0 && historyStack[historyIndex] && historyStack[historyIndex].text !== currentText) {
-          const offsets = getSelectionOffsets(editor);
-          historyStack.push({ text: currentText, start: offsets.start, end: offsets.end });
-          historyIndex = historyStack.length - 1;
-        }
-      }
-
+      flushDebouncedHistory();
       if (historyIndex > 0) {
         historyIndex--;
-        const state = historyStack[historyIndex];
-        editor.innerText = state.text;
-        if (editor.focus) editor.focus();
-        setSelectionOffsets(editor, state.start, state.end);
-        noteDirty = true;
-        checkEmptyState();
-        saveContent();
-        updateStats();
+        restoreHistoryState(historyStack[historyIndex]);
         return true;
       }
-      if (editor.focus) editor.focus();
-      if (typeof document !== 'undefined' && document.execCommand) {
-        try { document.execCommand('undo'); } catch (_) {}
-      }
+      editor.focus?.();
+      try { document.execCommand?.('undo'); } catch (_) {}
       return false;
     }
 
     function redo() {
       if (!editor) return false;
+      flushDebouncedHistory();
       if (historyIndex < historyStack.length - 1) {
         historyIndex++;
-        const state = historyStack[historyIndex];
-        editor.innerText = state.text;
-        if (editor.focus) editor.focus();
-        setSelectionOffsets(editor, state.start, state.end);
-        noteDirty = true;
-        checkEmptyState();
-        saveContent();
-        updateStats();
+        restoreHistoryState(historyStack[historyIndex]);
         return true;
       }
-      if (editor.focus) editor.focus();
-      if (typeof document !== 'undefined' && document.execCommand) {
-        try { document.execCommand('redo'); } catch (_) {}
-      }
+      editor.focus?.();
+      try { document.execCommand?.('redo'); } catch (_) {}
       return false;
     }
 
@@ -1445,8 +1382,7 @@
         saveTimeout = null;
         try {
           const raw = editor.innerText.replace(/\r\n/g, '\n');
-          const toSave = (raw === '' || raw === '\n') ? '' : editor.innerText;
-          localStorage.setItem(STORAGE_KEY, toSave);
+          localStorage.setItem(STORAGE_KEY, (raw === '' || raw === '\n') ? '' : editor.innerText);
           noteDirty = false;
           noteWriteFailed = false;
           setSaveStatus('Saved', 'saved');
@@ -1457,11 +1393,7 @@
         updateStorageWarning();
       };
 
-      if (immediate) {
-        doSave();
-      } else {
-        saveTimeout = setTimeout(doSave, 250);
-      }
+      immediate ? doSave() : (saveTimeout = setTimeout(doSave, 250));
     }
 
     editor.addEventListener('input', () => {
@@ -1476,16 +1408,13 @@
       if (e.key === 'Tab') {
         e.preventDefault();
         pushHistory(true);
-        if (document.execCommand) {
-          document.execCommand('insertText', false, '    ');
-        }
+        document.execCommand?.('insertText', false, '    ');
         noteDirty = true;
         checkEmptyState();
         saveContent();
         updateStats();
         pushHistory(true);
       }
-
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
         e.preventDefault();
         saveContent(true);
@@ -1497,9 +1426,7 @@
       e.preventDefault();
       pushHistory(true);
       const text = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
-      if (document.execCommand) {
-        document.execCommand('insertText', false, text);
-      }
+      document.execCommand?.('insertText', false, text);
       noteDirty = true;
       checkEmptyState();
       saveContent();
@@ -1515,15 +1442,9 @@
         checkEmptyState();
         updateStats();
       }
-      if (e.key === THEME_KEY && e.newValue !== currentTheme) {
-        applyTheme(e.newValue || 'auto');
-      }
-      if (e.key === MARGIN_KEY && e.newValue !== currentMargin) {
-        applyMargin(e.newValue || '20');
-      }
-      if (e.key === FONT_SIZE_KEY && e.newValue !== currentFontSize) {
-        applyFontSize(e.newValue || '20');
-      }
+      if (e.key === THEME_KEY && e.newValue !== currentTheme) applyTheme(e.newValue || 'auto');
+      if (e.key === MARGIN_KEY && e.newValue !== currentMargin) applyMargin(e.newValue || '20');
+      if (e.key === FONT_SIZE_KEY && e.newValue !== currentFontSize) applyFontSize(e.newValue || '20');
     });
 
     window.addEventListener('beforeunload', () => saveContent(true));
@@ -1534,14 +1455,12 @@
     function downloadNote() {
       const blob = new Blob([editor.innerText], { type: 'text/plain;charset=utf-8' });
       const now = new Date();
-      const timestamp = now.toISOString().slice(0, 10);
-      const filename = `inka-${timestamp}.txt`;
+      const filename = `inka-${now.toISOString().slice(0, 10)}.txt`;
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = filename;
       a.click();
       URL.revokeObjectURL(a.href);
-      // Export success says nothing about whether browser storage succeeded.
       downloadBtn.textContent = 'Downloaded';
       if (downloadTimeout) clearTimeout(downloadTimeout);
       downloadTimeout = setTimeout(() => {
@@ -1558,58 +1477,76 @@
     if (paletteHintText) paletteHintText.textContent = shortcutLabel;
 
     let savedSelectionRange = null;
+    let savedSelectedText = '';
     let activePaletteIndex = 0;
     let filteredTools = [];
 
+    function saveSelection() {
+      const sel = window.getSelection?.();
+      if (sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        if (range && editor && (editor === range.commonAncestorContainer || editor.contains?.(range.commonAncestorContainer))) {
+          savedSelectionRange = range.cloneRange ? range.cloneRange() : range;
+          if (range.collapsed) {
+            savedSelectedText = '';
+            return '';
+          }
+          let text = '';
+          const rText = range.toString?.();
+          if (rText && !rText.startsWith('[object ')) text = rText;
+          if (!text) {
+            const sText = sel.toString?.();
+            if (sText && !sText.startsWith('[object ')) text = sText;
+          }
+          if (!text && range.cloneContents && document.createElement) {
+            try {
+              const div = document.createElement('div');
+              div.appendChild(range.cloneContents());
+              if (div.innerText && !div.innerText.startsWith('[object ')) text = div.innerText;
+            } catch (_) {}
+          }
+          savedSelectedText = text.replace(/\r\n/g, '\n');
+          return savedSelectedText;
+        }
+      }
+      if (editor && document.createRange) {
+        const range = document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(false);
+        range.collapsed = true;
+        savedSelectionRange = range;
+      } else {
+        savedSelectionRange = null;
+      }
+      savedSelectedText = '';
+      return '';
+    }
+
+    function restoreSelection() {
+      editor?.focus?.();
+      if (savedSelectionRange && window.getSelection) {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(savedSelectionRange);
+      }
+    }
+
+    const lineMap = (fn) => (text) => fn(text.split('\n')).join('\n');
+    const parseRadix = (str, radix, prefix) => {
+      const trimmed = str.trim();
+      const clean = prefix && (trimmed.toLowerCase().startsWith(prefix.toLowerCase())) ? trimmed.slice(prefix.length) : trimmed;
+      const n = parseInt(clean, radix);
+      if (isNaN(n)) throw new Error('Invalid number');
+      return n;
+    };
+
     const TOOLS = [
-      {
-        id: 'json-prettify',
-        title: 'JSON Prettify',
-        desc: 'Format JSON with 2-space indentation',
-        keywords: 'json format pretty beautify indent',
-        icon: '{}',
-        run: (text) => JSON.stringify(JSON.parse(text), null, 2)
-      },
-      {
-        id: 'json-minify',
-        title: 'JSON Minify',
-        desc: 'Compact JSON into a single line',
-        keywords: 'json minify compact compress',
-        icon: '→|',
-        run: (text) => JSON.stringify(JSON.parse(text))
-      },
-      {
-        id: 'b64-encode',
-        title: 'Base64 Encode',
-        desc: 'e.g. hello → aGVsbG8=',
-        keywords: 'base64 b64 encode text',
-        icon: 'B64',
-        run: (text) => btoa(unescape(encodeURIComponent(text)))
-      },
-      {
-        id: 'b64-decode',
-        title: 'Base64 Decode',
-        desc: 'e.g. aGVsbG8= → hello',
-        keywords: 'base64 b64 decode decrypt text',
-        icon: 'TXT',
-        run: (text) => decodeURIComponent(escape(atob(text.trim())))
-      },
-      {
-        id: 'url-encode',
-        title: 'URL Encode',
-        desc: 'e.g. hello world → hello%20world',
-        keywords: 'url uri encode escape link',
-        icon: 'URL',
-        run: (text) => encodeURIComponent(text)
-      },
-      {
-        id: 'url-decode',
-        title: 'URL Decode',
-        desc: 'e.g. hello%20world → hello world',
-        keywords: 'url uri decode unescape link',
-        icon: 'URI',
-        run: (text) => decodeURIComponent(text)
-      },
+      { id: 'json-prettify', title: 'JSON Prettify', desc: 'Format JSON with 2-space indentation', keywords: 'json format pretty beautify indent', icon: '{}', run: (t) => JSON.stringify(JSON.parse(t), null, 2) },
+      { id: 'json-minify', title: 'JSON Minify', desc: 'Compact JSON into a single line', keywords: 'json minify compact compress', icon: '→|', run: (t) => JSON.stringify(JSON.parse(t)) },
+      { id: 'b64-encode', title: 'Base64 Encode', desc: 'e.g. hello → aGVsbG8=', keywords: 'base64 b64 encode text', icon: 'B64', run: (t) => btoa(unescape(encodeURIComponent(t))) },
+      { id: 'b64-decode', title: 'Base64 Decode', desc: 'e.g. aGVsbG8= → hello', keywords: 'base64 b64 decode decrypt text', icon: 'TXT', run: (t) => decodeURIComponent(escape(atob(t.trim()))) },
+      { id: 'url-encode', title: 'URL Encode', desc: 'e.g. hello world → hello%20world', keywords: 'url uri encode escape link', icon: 'URL', run: (t) => encodeURIComponent(t) },
+      { id: 'url-decode', title: 'URL Decode', desc: 'e.g. hello%20world → hello world', keywords: 'url uri decode unescape link', icon: 'URI', run: (t) => decodeURIComponent(t) },
       {
         id: 'jwt-decode',
         title: 'JWT Decode',
@@ -1636,8 +1573,7 @@
         run: (text) => {
           const num = Number(text.trim());
           if (isNaN(num)) throw new Error('Invalid timestamp');
-          const ms = num < 1e11 ? num * 1000 : num;
-          return new Date(ms).toISOString();
+          return new Date(num < 1e11 ? num * 1000 : num).toISOString();
         }
       },
       {
@@ -1652,146 +1588,21 @@
           return Math.floor(ms / 1000).toString();
         }
       },
-      {
-        id: 'dec-to-hex',
-        title: 'Decimal to Hex',
-        desc: 'e.g. 255 → 0xFF',
-        keywords: 'dec decimal hex hexadecimal base convert',
-        icon: '0x',
-        run: (text) => {
-          const num = parseInt(text.trim(), 10);
-          if (isNaN(num)) throw new Error('Invalid number');
-          return `0x${num.toString(16).toUpperCase()}`;
-        }
-      },
-      {
-        id: 'hex-to-dec',
-        title: 'Hex to Decimal',
-        desc: 'e.g. 0xFF → 255',
-        keywords: 'hex hexadecimal to dec decimal base parse',
-        icon: '10',
-        run: (text) => {
-          const clean = text.trim();
-          const hex = clean.startsWith('0x') || clean.startsWith('0X') ? clean.slice(2) : clean;
-          const num = parseInt(hex, 16);
-          if (isNaN(num)) throw new Error('Invalid hex');
-          return num.toString(10);
-        }
-      },
-      {
-        id: 'dec-to-bin',
-        title: 'Decimal to Binary',
-        desc: 'e.g. 42 → 0b101010',
-        keywords: 'dec decimal bin binary base convert',
-        icon: '0b',
-        run: (text) => {
-          const num = parseInt(text.trim(), 10);
-          if (isNaN(num)) throw new Error('Invalid number');
-          return `0b${num.toString(2)}`;
-        }
-      },
-      {
-        id: 'bin-to-dec',
-        title: 'Binary to Decimal',
-        desc: 'e.g. 0b101010 → 42',
-        keywords: 'bin binary to dec decimal base parse',
-        icon: '01',
-        run: (text) => {
-          const clean = text.trim();
-          const bin = clean.startsWith('0b') || clean.startsWith('0B') ? clean.slice(2) : clean;
-          const num = parseInt(bin, 2);
-          if (isNaN(num)) throw new Error('Invalid binary');
-          return num.toString(10);
-        }
-      },
-      {
-        id: 'case-camel',
-        title: 'Transform to camelCase',
-        desc: 'e.g. inkaAppNotes',
-        keywords: 'case camel camelCase string transform',
-        icon: 'aB',
-        run: (text) => text.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, c) => c.toUpperCase())
-      },
-      {
-        id: 'case-snake',
-        title: 'Transform to snake_case',
-        desc: 'e.g. inka_app_notes',
-        keywords: 'case snake snake_case string transform',
-        icon: 'a_b',
-        run: (text) => text.replace(/([a-z])([A-Z])/g, '$1_$2').replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase()
-      },
-      {
-        id: 'case-kebab',
-        title: 'Transform to kebab-case',
-        desc: 'e.g. inka-app-notes',
-        keywords: 'case kebab kebab-case slug transform',
-        icon: 'a-b',
-        run: (text) => text.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()
-      },
-      {
-        id: 'case-title',
-        title: 'Transform to Title Case',
-        desc: 'e.g. Inka App Notes',
-        keywords: 'case title titlecase headline capitalize transform',
-        icon: 'Aa',
-        run: (text) => text.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
-      },
-      {
-        id: 'case-upper',
-        title: 'Transform to UPPERCASE',
-        desc: 'e.g. INKA APP NOTES',
-        keywords: 'case upper uppercase capital',
-        icon: 'AA',
-        run: (text) => text.toUpperCase()
-      },
-      {
-        id: 'case-lower',
-        title: 'Transform to lowercase',
-        desc: 'e.g. inka app notes',
-        keywords: 'case lower lowercase small',
-        icon: 'aa',
-        run: (text) => text.toLowerCase()
-      },
-      {
-        id: 'lines-sort',
-        title: 'Sort Lines',
-        desc: 'Sort lines alphabetically (A → Z)',
-        keywords: 'sort lines order alphabetize asc a-z',
-        icon: 'A-Z',
-        run: (text) => text.split('\n').sort((a, b) => a.localeCompare(b)).join('\n')
-      },
-      {
-        id: 'lines-reverse',
-        title: 'Reverse Lines',
-        desc: 'Invert line order from top to bottom',
-        keywords: 'lines reverse invert order flip rev',
-        icon: 'REV',
-        run: (text) => text.split('\n').reverse().join('\n')
-      },
-      {
-        id: 'lines-unique',
-        title: 'Deduplicate Lines',
-        desc: 'Filter out duplicate lines',
-        keywords: 'dedup duplicate unique lines clean distinct uniq',
-        icon: 'UNIQ',
-        run: (text) => [...new Set(text.split('\n'))].join('\n')
-      },
-      {
-        id: 'lines-clean',
-        title: 'Remove Empty Lines',
-        desc: 'Remove empty or blank lines',
-        keywords: 'clean empty strip blank lines delete remove',
-        icon: 'DEL',
-        run: (text) => text.split('\n').filter(l => l.trim().length > 0).join('\n')
-      },
-      {
-        id: 'lines-trim',
-        title: 'Trim Lines',
-        desc: 'Strip leading and trailing whitespace',
-        keywords: 'trim whitespace strip leading trailing lines clean',
-        icon: 'TRIM',
-        run: (text) => text.split('\n').map(l => l.trim()).join('\n')
-      },
+      { id: 'dec-to-hex', title: 'Decimal to Hex', desc: 'e.g. 255 → 0xFF', keywords: 'dec decimal hex hexadecimal base convert', icon: '0x', run: (t) => `0x${parseRadix(t, 10).toString(16).toUpperCase()}` },
+      { id: 'hex-to-dec', title: 'Hex to Decimal', desc: 'e.g. 0xFF → 255', keywords: 'hex hexadecimal to dec decimal base parse', icon: '10', run: (t) => parseRadix(t, 16, '0x').toString(10) },
+      { id: 'dec-to-bin', title: 'Decimal to Binary', desc: 'e.g. 42 → 0b101010', keywords: 'dec decimal bin binary base convert', icon: '0b', run: (t) => `0b${parseRadix(t, 10).toString(2)}` },
+      { id: 'bin-to-dec', title: 'Binary to Decimal', desc: 'e.g. 0b101010 → 42', keywords: 'bin binary to dec decimal base parse', icon: '01', run: (t) => parseRadix(t, 2, '0b').toString(10) },
+      { id: 'case-camel', title: 'Transform to camelCase', desc: 'e.g. inkaAppNotes', keywords: 'case camel camelCase string transform', icon: 'aB', run: (t) => t.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, c) => c.toUpperCase()) },
+      { id: 'case-snake', title: 'Transform to snake_case', desc: 'e.g. inka_app_notes', keywords: 'case snake snake_case string transform', icon: 'a_b', run: (t) => t.replace(/([a-z])([A-Z])/g, '$1_$2').replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase() },
+      { id: 'case-kebab', title: 'Transform to kebab-case', desc: 'e.g. inka-app-notes', keywords: 'case kebab kebab-case slug transform', icon: 'a-b', run: (t) => t.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase() },
+      { id: 'case-title', title: 'Transform to Title Case', desc: 'e.g. Inka App Notes', keywords: 'case title titlecase headline capitalize transform', icon: 'Aa', run: (t) => t.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) },
+      { id: 'case-upper', title: 'Transform to UPPERCASE', desc: 'e.g. INKA APP NOTES', keywords: 'case upper uppercase capital', icon: 'AA', run: (t) => t.toUpperCase() },
+      { id: 'case-lower', title: 'Transform to lowercase', desc: 'e.g. inka app notes', keywords: 'case lower lowercase small', icon: 'aa', run: (t) => t.toLowerCase() },
+      { id: 'lines-sort', title: 'Sort Lines', desc: 'Sort lines alphabetically (A → Z)', keywords: 'sort lines order alphabetize asc a-z', icon: 'A-Z', run: lineMap((l) => l.sort((a, b) => a.localeCompare(b))) },
+      { id: 'lines-reverse', title: 'Reverse Lines', desc: 'Invert line order from top to bottom', keywords: 'lines reverse invert order flip rev', icon: 'REV', run: lineMap((l) => l.reverse()) },
+      { id: 'lines-unique', title: 'Deduplicate Lines', desc: 'Filter out duplicate lines', keywords: 'dedup duplicate unique lines clean distinct uniq', icon: 'UNIQ', run: lineMap((l) => [...new Set(l)]) },
+      { id: 'lines-clean', title: 'Remove Empty Lines', desc: 'Remove empty or blank lines', keywords: 'clean empty strip blank lines delete remove', icon: 'DEL', run: lineMap((l) => l.filter((x) => x.trim().length > 0)) },
+      { id: 'lines-trim', title: 'Trim Lines', desc: 'Strip leading and trailing whitespace', keywords: 'trim whitespace strip leading trailing lines clean', icon: 'TRIM', run: lineMap((l) => l.map((x) => x.trim())) },
       {
         id: 'eval-math',
         title: 'Evaluate Math Expression (=)',
@@ -1800,225 +1611,76 @@
         icon: 'CALC',
         run: (text) => {
           let expr = text.trim();
-          if (expr.endsWith('=')) {
-            expr = expr.slice(0, -1).trim();
-          }
+          if (expr.endsWith('=')) expr = expr.slice(0, -1).trim();
           if (!expr) throw new Error('Empty expression');
-
-          // Replace common multiplication and division symbols
           expr = expr.replace(/×/g, '*').replace(/÷/g, '/');
-
-          // Strict validation: allow numbers, operators, parens, spaces, and Math.*
           const stripped = expr.replace(/\bMath\.(PI|E|abs|round|floor|ceil|sqrt|cbrt|pow|min|max|sin|cos|tan|log|log10|log2)\b/g, '')
-                               .replace(/[0-9\.\+\-\*\/\%\(\)\,\s]/g, '');
-          if (stripped.length > 0) {
-            throw new Error('Invalid expression characters');
-          }
-
-          const fn = new Function(`"use strict"; return (${expr});`);
-          const val = fn();
+                               .replace(/[0-9\.\+\-\*/\%\(\)\,\s]/g, '');
+          if (stripped.length > 0) throw new Error('Invalid expression characters');
+          const val = new Function(`"use strict"; return (${expr});`)();
           if (val === undefined || val === null || (typeof val === 'number' && !isFinite(val))) {
             throw new Error('Invalid calculation result');
           }
-
           const trimmed = text.trimEnd();
-          const separator = trimmed.endsWith('=') ? ' ' : ' = ';
-          return `${trimmed}${separator}${val}`;
+          return `${trimmed}${trimmed.endsWith('=') ? ' ' : ' = '}${val}`;
         },
-        onError: () => {
-          showToast('Invalid input');
-        }
+        onError: () => showToast('Invalid input')
       },
-      {
-        id: 'insert-uuid',
-        title: 'Insert UUID v4',
-        desc: 'Generate random UUID v4',
-        keywords: 'uuid guid random id generate insert',
-        icon: 'UUID',
-        allowEmptySelection: true,
-        run: () => crypto.randomUUID()
-      },
-      {
-        id: 'insert-epoch',
-        title: 'Insert Current Epoch Timestamp',
-        desc: 'Insert Unix seconds since epoch',
-        keywords: 'now timestamp epoch unix seconds time current insert sec',
-        icon: 'SEC',
-        allowEmptySelection: true,
-        run: () => Math.floor(Date.now() / 1000).toString()
-      },
-      {
-        id: 'insert-timestamp',
-        title: 'Insert Current UTC Timestamp',
-        desc: 'Insert ISO 8601 UTC timestamp',
-        keywords: 'now timestamp utc time current datetime iso insert 8601',
-        icon: 'ISO',
-        allowEmptySelection: true,
-        run: () => new Date().toISOString()
-      },
-      {
-        id: 'insert-date',
-        title: 'Insert Current UTC Date',
-        desc: 'Insert current UTC date (YYYY-MM-DD)',
-        keywords: 'date utc today current day calendar insert yyyy-mm-dd',
-        icon: 'DATE',
-        allowEmptySelection: true,
-        run: () => new Date().toISOString().slice(0, 10)
-      }
+      { id: 'insert-uuid', title: 'Insert UUID v4', desc: 'Generate random UUID v4', keywords: 'uuid guid random id generate insert', icon: 'UUID', allowEmptySelection: true, run: () => crypto.randomUUID() },
+      { id: 'insert-epoch', title: 'Insert Current Epoch Timestamp', desc: 'Insert Unix seconds since epoch', keywords: 'now timestamp epoch unix seconds time current insert sec', icon: 'SEC', allowEmptySelection: true, run: () => Math.floor(Date.now() / 1000).toString() },
+      { id: 'insert-timestamp', title: 'Insert Current UTC Timestamp', desc: 'Insert ISO 8601 UTC timestamp', keywords: 'now timestamp utc time current datetime iso insert 8601', icon: 'ISO', allowEmptySelection: true, run: () => new Date().toISOString() },
+      { id: 'insert-date', title: 'Insert Current UTC Date', desc: 'Insert current UTC date (YYYY-MM-DD)', keywords: 'date utc today current day calendar insert yyyy-mm-dd', icon: 'DATE', allowEmptySelection: true, run: () => new Date().toISOString().slice(0, 10) }
     ];
-
-    let toastTimeout = null;
-    function showToast(message, duration = 2200) {
-      const toast = document.getElementById('toast');
-      if (!toast) return;
-      toast.textContent = message;
-      if (toast.classList) {
-        toast.classList.toggle('show', true);
-      }
-      if (toastTimeout) clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        if (toast.classList) {
-          toast.classList.remove('show');
-        }
-      }, duration);
-    }
-
-    let savedSelectedText = '';
-
-    function saveSelection() {
-      const sel = (typeof window !== 'undefined' && window.getSelection) ? window.getSelection() : null;
-      if (sel && sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
-        if (range && editor && (editor === range.commonAncestorContainer || (editor.contains && editor.contains(range.commonAncestorContainer)))) {
-          savedSelectionRange = range.cloneRange ? range.cloneRange() : range;
-          if (range.collapsed) {
-            savedSelectedText = '';
-            return '';
-          }
-          let text = '';
-          if (typeof range.toString === 'function') {
-            const rText = range.toString();
-            if (rText && !rText.startsWith('[object ')) text = rText;
-          }
-          if (typeof sel.toString === 'function') {
-            const sText = sel.toString();
-            if (sText && !sText.startsWith('[object ')) text = sText;
-          }
-          if (range.cloneContents && typeof document !== 'undefined' && document.createElement) {
-            try {
-              const div = document.createElement('div');
-              div.appendChild(range.cloneContents());
-              if (div.innerText && !div.innerText.startsWith('[object ')) {
-                text = div.innerText;
-              }
-            } catch (_) {}
-          }
-          savedSelectedText = text.replace(/\r\n/g, '\n');
-          return savedSelectedText;
-        }
-      }
-      if (editor) {
-        const range = (typeof document !== 'undefined' && document.createRange) ? document.createRange() : null;
-        if (range && range.selectNodeContents && range.collapse) {
-          range.selectNodeContents(editor);
-          range.collapse(false);
-          range.collapsed = true;
-          savedSelectionRange = range.cloneRange ? range.cloneRange() : range;
-        }
-      } else {
-        savedSelectionRange = null;
-      }
-      savedSelectedText = '';
-      return '';
-    }
-
-    function restoreSelection() {
-      if (editor) {
-        editor.focus();
-      }
-      if (savedSelectionRange && typeof window !== 'undefined' && window.getSelection) {
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(savedSelectionRange);
-      }
-    }
 
     function renderPaletteList(query = '') {
       const q = query.trim().toLowerCase();
-      filteredTools = TOOLS.filter(tool => {
-        if (!q) return true;
-        return tool.title.toLowerCase().includes(q) ||
-               tool.desc.toLowerCase().includes(q) ||
-               tool.keywords.toLowerCase().includes(q);
-      });
-
+      filteredTools = TOOLS.filter(tool => !q || tool.title.toLowerCase().includes(q) || tool.desc.toLowerCase().includes(q) || tool.keywords.toLowerCase().includes(q));
       activePaletteIndex = 0;
       if (!paletteList) return;
 
-      if (filteredTools.length === 0) {
-        paletteList.innerHTML = '<div class="palette-empty">No matching tools found</div>';
-        return;
-      }
-
-      paletteList.innerHTML = filteredTools.map((tool, idx) => `
-        <div class="palette-item ${idx === 0 ? 'active' : ''}" data-index="${idx}" role="option" aria-selected="${idx === 0}">
-          <span class="palette-item-icon">${tool.icon}</span>
-          <div class="palette-item-info">
-            <span class="palette-item-title">${tool.title}</span>
-            <span class="palette-item-desc">${tool.desc}</span>
+      paletteList.innerHTML = filteredTools.length === 0
+        ? '<div class="palette-empty">No matching tools found</div>'
+        : filteredTools.map((tool, idx) => `
+          <div class="palette-item ${idx === 0 ? 'active' : ''}" data-index="${idx}" role="option" aria-selected="${idx === 0}">
+            <span class="palette-item-icon">${tool.icon}</span>
+            <div class="palette-item-info">
+              <span class="palette-item-title">${tool.title}</span>
+              <span class="palette-item-desc">${tool.desc}</span>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `).join('');
     }
 
     function updateActivePaletteItem() {
       if (!paletteList) return;
-      const items = paletteList.querySelectorAll ? paletteList.querySelectorAll('.palette-item') : (paletteList.children || []);
+      const items = paletteList.querySelectorAll?.('.palette-item') || paletteList.children || [];
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         const isActive = i === activePaletteIndex;
-        if (item.classList) item.classList.toggle('active', isActive);
-        if (item.setAttribute) item.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        if (isActive && item.scrollIntoView) {
-          item.scrollIntoView({ block: 'nearest' });
-        }
+        item.classList?.toggle('active', isActive);
+        item.setAttribute?.('aria-selected', isActive ? 'true' : 'false');
+        if (isActive) item.scrollIntoView?.({ block: 'nearest' });
       }
     }
 
     function openPalette() {
-      if (settingsPanel && settingsPanel.classList.contains('open')) {
-        settingsPanel.classList.remove('open');
-        appearanceBtn.setAttribute('aria-expanded', 'false');
-      }
+      toggleSettings(false);
       const selectedText = saveSelection();
       if (paletteSelectionStatus) {
-        if (selectedText) {
-          const len = selectedText.length;
-          paletteSelectionStatus.textContent = `Selection: ${len} character${len === 1 ? '' : 's'}`;
-        } else {
-          paletteSelectionStatus.textContent = 'No text selected (insert tools available)';
-        }
+        paletteSelectionStatus.textContent = selectedText
+          ? `Selection: ${selectedText.length} character${selectedText.length === 1 ? '' : 's'}`
+          : 'No text selected (insert tools available)';
       }
       if (paletteInput) paletteInput.value = '';
       renderPaletteList('');
-      if (paletteBackdrop && paletteBackdrop.classList) {
-        paletteBackdrop.classList.toggle('open', true);
-      }
-      if (paletteBtn && paletteBtn.setAttribute) {
-        paletteBtn.setAttribute('aria-expanded', 'true');
-      }
-      setTimeout(() => {
-        if (paletteInput && paletteInput.focus) paletteInput.focus();
-      }, 30);
+      paletteBackdrop?.classList?.toggle('open', true);
+      paletteBtn?.setAttribute?.('aria-expanded', 'true');
+      setTimeout(() => paletteInput?.focus?.(), 30);
     }
 
     function closePalette() {
-      if (paletteBackdrop && paletteBackdrop.classList) {
-        paletteBackdrop.classList.remove('open');
-      }
-      if (paletteBtn && paletteBtn.setAttribute) {
-        paletteBtn.setAttribute('aria-expanded', 'false');
-      }
+      paletteBackdrop?.classList?.remove('open');
+      paletteBtn?.setAttribute?.('aria-expanded', 'false');
       restoreSelection();
       savedSelectionRange = null;
       savedSelectedText = '';
@@ -2026,48 +1688,33 @@
 
     function insertTextPreservingLines(text) {
       if (!text.includes('\n')) {
-        if (document.execCommand) {
-          document.execCommand('insertText', false, text);
-        }
+        document.execCommand?.('insertText', false, text);
         return;
       }
       const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      const lines = text.split('\n');
-      const html = lines.map((line, idx) => {
+      const html = text.split('\n').map((line, idx) => {
         const content = line ? escape(line) : '<br>';
-        return idx === 0 ? content : '<div>' + content + '</div>';
+        return idx === 0 ? content : `<div>${content}</div>`;
       }).join('');
-      if (document.execCommand) {
-        const ok = document.execCommand('insertHTML', false, html);
-        if (!ok) {
-          document.execCommand('insertText', false, text);
-        }
+      if (!document.execCommand?.('insertHTML', false, html)) {
+        document.execCommand?.('insertText', false, text);
       }
     }
 
     function executeTool(tool) {
       let selectedText = '';
       if (savedSelectionRange && !savedSelectionRange.collapsed) {
-        selectedText = savedSelectedText || (typeof savedSelectionRange.toString === 'function' ? savedSelectionRange.toString() : '');
+        selectedText = savedSelectedText || savedSelectionRange.toString?.() || '';
       }
 
       if (!tool.allowEmptySelection && !selectedText) {
-        // If tool requires selection and no text is highlighted, do nothing
         closePalette();
         return;
       }
 
-      // Close modal backdrop first so paletteInput is blurred
-      if (paletteBackdrop && paletteBackdrop.classList) {
-        paletteBackdrop.classList.remove('open');
-      }
-      if (paletteBtn && paletteBtn.setAttribute) {
-        paletteBtn.setAttribute('aria-expanded', 'false');
-      }
-
-      // Restore focus and selection to editor BEFORE execCommand
+      paletteBackdrop?.classList?.remove('open');
+      paletteBtn?.setAttribute?.('aria-expanded', 'false');
       restoreSelection();
-
       pushHistory(true);
 
       try {
@@ -2083,114 +1730,82 @@
       } catch (err) {
         if (tool.onError) {
           tool.onError(err);
-        } else if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+        } else {
           console.warn('Transformation failed:', err);
         }
       }
 
-      // Invalidate savedSelectionRange so it cannot be re-applied
       savedSelectionRange = null;
       savedSelectedText = '';
+      editor?.focus?.();
+    }
 
-      // Ensure editor remains focused
-      if (editor) {
-        editor.focus();
+    paletteList?.addEventListener('click', (e) => {
+      const item = e.target?.closest?.('.palette-item');
+      if (item) {
+        const idx = parseInt(item.getAttribute('data-index'), 10);
+        if (filteredTools[idx]) executeTool(filteredTools[idx]);
       }
-    }
+    });
 
-    if (paletteList) {
-      paletteList.addEventListener('click', (e) => {
-        const target = e.target;
-        const item = target && target.closest ? target.closest('.palette-item') : null;
-        if (item && item.getAttribute) {
-          const idx = parseInt(item.getAttribute('data-index'), 10);
-          if (filteredTools[idx]) executeTool(filteredTools[idx]);
+    paletteBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      paletteBackdrop?.classList.contains('open') ? closePalette() : openPalette();
+    });
+
+    paletteBackdrop?.addEventListener('click', (e) => {
+      if (e.target === paletteBackdrop) closePalette();
+    });
+
+    paletteInput?.addEventListener('input', (e) => renderPaletteList(e.target.value));
+
+    paletteInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (filteredTools.length > 0) {
+          activePaletteIndex = (activePaletteIndex + 1) % filteredTools.length;
+          updateActivePaletteItem();
         }
-      });
-    }
-
-    if (paletteBtn) {
-      paletteBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (paletteBackdrop && paletteBackdrop.classList.contains('open')) {
-          closePalette();
-        } else {
-          openPalette();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (filteredTools.length > 0) {
+          activePaletteIndex = (activePaletteIndex - 1 + filteredTools.length) % filteredTools.length;
+          updateActivePaletteItem();
         }
-      });
-    }
-
-    if (paletteBackdrop) {
-      paletteBackdrop.addEventListener('click', (e) => {
-        if (e.target === paletteBackdrop) {
-          closePalette();
-        }
-      });
-    }
-
-    if (paletteInput) {
-      paletteInput.addEventListener('input', (e) => {
-        renderPaletteList(e.target.value);
-      });
-
-      paletteInput.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          if (filteredTools.length > 0) {
-            activePaletteIndex = (activePaletteIndex + 1) % filteredTools.length;
-            updateActivePaletteItem();
-          }
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          if (filteredTools.length > 0) {
-            activePaletteIndex = (activePaletteIndex - 1 + filteredTools.length) % filteredTools.length;
-            updateActivePaletteItem();
-          }
-        } else if (e.key === 'Enter') {
-          e.preventDefault();
-          if (filteredTools[activePaletteIndex]) {
-            executeTool(filteredTools[activePaletteIndex]);
-          }
-        } else if (e.key === 'Escape') {
-          e.preventDefault();
-          closePalette();
-        }
-      });
-    }
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (filteredTools[activePaletteIndex]) executeTool(filteredTools[activePaletteIndex]);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        closePalette();
+      }
+    });
 
     document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+      const key = e.key.toLowerCase();
+      const isPaletteOpen = paletteBackdrop?.classList.contains('open');
+
+      if (isCmdOrCtrl && key === 'k') {
         e.preventDefault();
-        if (paletteBackdrop && paletteBackdrop.classList.contains('open')) {
-          closePalette();
-        } else {
-          openPalette();
-        }
-      } else if (e.key === 'Escape' && paletteBackdrop && paletteBackdrop.classList.contains('open')) {
+        isPaletteOpen ? closePalette() : openPalette();
+      } else if (e.key === 'Escape' && isPaletteOpen) {
         closePalette();
-      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
-        const isPaletteOpen = paletteBackdrop && paletteBackdrop.classList && paletteBackdrop.classList.contains('open');
-        if (!isPaletteOpen) {
-          if (e.preventDefault) e.preventDefault();
-          if (e.shiftKey) {
-            redo();
-          } else {
-            undo();
-          }
-        }
-      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') {
-        const isPaletteOpen = paletteBackdrop && paletteBackdrop.classList && paletteBackdrop.classList.contains('open');
-        if (!isPaletteOpen) {
-          if (e.preventDefault) e.preventDefault();
+      } else if (isCmdOrCtrl && !isPaletteOpen) {
+        if (key === 'z') {
+          e.preventDefault();
+          e.shiftKey ? redo() : undo();
+        } else if (key === 'y') {
+          e.preventDefault();
           redo();
         }
       }
     });
 
     updateStats();
-    editor.focus();
+    editor?.focus?.();
 
-    if (editor.innerText.length > 0) {
+    if (editor && editor.innerText.length > 0 && document.createRange && window.getSelection) {
       const range = document.createRange();
       const sel = window.getSelection();
       range.selectNodeContents(editor);
