@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Validate syntax
+        run: node -e "const fs = require('fs'); const html = fs.readFileSync('index.html', 'utf8'); new Function(html.match(/<script>([\s\S]*?)<\/script>/)[1]);"
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

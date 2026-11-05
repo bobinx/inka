@@ -200,6 +200,17 @@
       transition: left 0.12s ease-out, right 0.12s ease-out;
     }
 
+    /* Glassmorphism surfaces */
+    #status-bar,
+    #settings-panel,
+    #palette-modal,
+    #toast {
+      background: var(--status-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--status-border);
+    }
+
     /* Settings popover */
     #settings-panel {
       position: fixed;
@@ -208,10 +219,6 @@
       transform: translate(-50%, 8px);
       width: calc(100vw - 1.5rem);
       max-width: 320px;
-      background: var(--status-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--status-border);
       border-radius: 14px;
       padding: 0.95rem 1.05rem;
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06);
@@ -290,6 +297,13 @@
     }
 
     .theme-glyph {
+      width: 12px;
+      height: 12px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
       flex-shrink: 0;
       opacity: 0.75;
       transition: transform 0.15s ease, opacity 0.15s ease;
@@ -423,10 +437,6 @@
       font-family: var(--font-sans);
       font-size: 0.78rem;
       color: var(--text);
-      background: var(--status-bg);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid var(--status-border);
       border-radius: 9999px;
       user-select: none;
       box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
@@ -647,10 +657,6 @@
     #palette-modal {
       width: 100%;
       max-width: 480px;
-      background: var(--status-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--status-border);
       border-radius: 14px;
       box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.08);
       display: flex;
@@ -676,6 +682,11 @@
     .palette-search-icon {
       width: 14px;
       height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
       opacity: 0.6;
       flex-shrink: 0;
       display: inline-block;
@@ -749,21 +760,22 @@
       min-width: 0;
     }
 
-    .palette-item-title {
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: var(--text);
+    .palette-item-title,
+    .palette-item-desc {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
+    .palette-item-title {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
     .palette-item-desc {
       font-size: 0.71rem;
       color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .palette-empty {
@@ -800,10 +812,6 @@
       top: 1.5rem;
       left: 50%;
       transform: translate(-50%, -8px);
-      background: var(--status-bg);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid var(--status-border);
       color: var(--text);
       font-family: var(--font-sans);
       font-size: 0.8rem;
@@ -882,7 +890,7 @@
   <div id="palette-backdrop" role="dialog" aria-modal="true" aria-label="Command Palette">
     <div id="palette-modal">
       <div class="palette-search-wrapper">
-        <svg class="palette-search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg class="palette-search-icon" viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="11" cy="11" r="8"/>
           <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
@@ -914,28 +922,19 @@
       </div>
       <div class="theme-segmented" role="radiogroup" aria-label="Theme selection">
         <button type="button" class="theme-opt" data-theme-val="auto" role="radio" aria-checked="true" title="Auto (System) theme">
-          <svg class="theme-glyph" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor" stroke="none"/>
-          </svg>
+          <svg class="theme-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor" stroke="none"/></svg>
           Auto
         </button>
         <button type="button" class="theme-opt" data-theme-val="light" role="radio" aria-checked="false" title="Light theme">
-          <svg class="theme-glyph" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="9"/>
-          </svg>
+          <svg class="theme-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>
           Light
         </button>
         <button type="button" class="theme-opt" data-theme-val="dark" role="radio" aria-checked="false" title="Dark theme">
-          <svg class="theme-glyph" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" fill="currentColor" stroke="none"/>
-          </svg>
+          <svg class="theme-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" fill="currentColor" stroke="none"/></svg>
           Dark
         </button>
         <button type="button" class="theme-opt" data-theme-val="midnight" role="radio" aria-checked="false" title="Midnight OLED theme">
-          <svg class="theme-glyph" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" fill="currentColor"/>
-          </svg>
+          <svg class="theme-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="currentColor"/></svg>
           Midnight
         </button>
       </div>
@@ -1147,32 +1146,22 @@
 
     applyTheme(currentTheme);
 
-    // Margins
-    let currentMargin = readPreference(MARGIN_KEY) || '20';
-    function applyMargin(val) {
-      currentMargin = val;
-      document.documentElement.style.setProperty('--margin-slider', val);
-      marginSlider.value = val;
+    // Sliders
+    function bindSlider(slider, key, varName, defaultVal, unit = '', displayEl = null) {
+      const apply = (val) => {
+        document.documentElement.style.setProperty(varName, `${val}${unit}`);
+        slider.value = val;
+        if (displayEl) displayEl.textContent = `${val}${unit}`;
+      };
+      apply(readPreference(key) || defaultVal);
+      slider.addEventListener('input', (e) => {
+        writePreference(key, e.target.value);
+        apply(e.target.value);
+      });
     }
-    marginSlider.addEventListener('input', (e) => {
-      writePreference(MARGIN_KEY, e.target.value);
-      applyMargin(e.target.value);
-    });
-    applyMargin(currentMargin);
 
-    // Font size
-    let currentFontSize = readPreference(FONT_SIZE_KEY) || '20';
-    function applyFontSize(val) {
-      currentFontSize = val;
-      document.documentElement.style.setProperty('--font-size', `${val}px`);
-      fontSizeSlider.value = val;
-      fontSizeValDisplay.textContent = `${val}px`;
-    }
-    fontSizeSlider.addEventListener('input', (e) => {
-      writePreference(FONT_SIZE_KEY, e.target.value);
-      applyFontSize(e.target.value);
-    });
-    applyFontSize(currentFontSize);
+    bindSlider(marginSlider, MARGIN_KEY, '--margin-slider', '20');
+    bindSlider(fontSizeSlider, FONT_SIZE_KEY, '--font-size', '20', 'px', fontSizeValDisplay);
 
     // Settings panel
     function toggleSettings(open = !settingsPanel.classList.contains('open')) {
@@ -1443,8 +1432,16 @@
         updateStats();
       }
       if (e.key === THEME_KEY && e.newValue !== currentTheme) applyTheme(e.newValue || 'auto');
-      if (e.key === MARGIN_KEY && e.newValue !== currentMargin) applyMargin(e.newValue || '20');
-      if (e.key === FONT_SIZE_KEY && e.newValue !== currentFontSize) applyFontSize(e.newValue || '20');
+      if (e.key === MARGIN_KEY) {
+        document.documentElement.style.setProperty('--margin-slider', e.newValue || '20');
+        marginSlider.value = e.newValue || '20';
+      }
+      if (e.key === FONT_SIZE_KEY) {
+        const sz = e.newValue || '20';
+        document.documentElement.style.setProperty('--font-size', `${sz}px`);
+        fontSizeSlider.value = sz;
+        fontSizeValDisplay.textContent = `${sz}px`;
+      }
     });
 
     window.addEventListener('beforeunload', () => saveContent(true));
