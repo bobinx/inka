@@ -13,7 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Inka - A quiet page that remembers. A browser notepad with no signups and no downloads.">
   <title>Inka</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cstyle%3Epath{fill:%2318181b}@media(prefers-color-scheme:dark){path{fill:%23f4f4f5}}%3C/style%3E%3Cpath d='M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z'/%3E%3C/svg%3E">
   <style>
     :root {
       --bg: #fafafa;
@@ -285,8 +285,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.25rem;
-      padding: 0.38rem 0.15rem;
+      gap: 0.32rem;
+      padding: 0.4rem 0.2rem;
       font-family: inherit;
       font-size: 0.72rem;
       color: var(--muted);
@@ -310,19 +310,126 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
+    .theme-glyph {
+      flex-shrink: 0;
+      opacity: 0.75;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .theme-opt:hover .theme-glyph,
+    .theme-opt.active .theme-glyph {
+      opacity: 1;
+    }
+
+    .theme-opt:hover .theme-glyph {
+      transform: scale(1.12);
+    }
+
     .slider-container {
       display: flex;
       align-items: center;
     }
 
     input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
       flex: 1;
+      width: 100%;
+      height: 20px;
+      background: transparent;
+      outline: none;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+    }
+
+    input[type="range"]:focus-visible {
+      outline: none;
+    }
+
+    /* Track: WebKit / Blink */
+    input[type="range"]::-webkit-slider-runnable-track {
+      width: 100%;
       height: 4px;
       background: var(--panel-inner-bg);
+      border: 1px solid var(--status-border);
       border-radius: 9999px;
-      outline: none;
-      accent-color: var(--accent);
+      box-sizing: border-box;
       cursor: pointer;
+    }
+
+    /* Thumb: WebKit / Blink */
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--opt-active-bg);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      margin-top: -5px;
+      box-sizing: border-box;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    input[type="range"]:hover::-webkit-slider-thumb {
+      transform: scale(1.15);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    input[type="range"]:active::-webkit-slider-thumb {
+      transform: scale(1.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    input[type="range"]:focus-visible::-webkit-slider-thumb {
+      box-shadow: 0 0 0 2px var(--status-bg), 0 0 0 4px var(--accent);
+    }
+
+    /* Track: Firefox */
+    input[type="range"]::-moz-range-track {
+      width: 100%;
+      height: 4px;
+      background: var(--panel-inner-bg);
+      border: 1px solid var(--status-border);
+      border-radius: 9999px;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    /* Thumb: Firefox */
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--opt-active-bg);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      box-sizing: border-box;
+      border-style: solid;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    input[type="range"]:hover::-moz-range-thumb {
+      transform: scale(1.15);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    input[type="range"]:active::-moz-range-thumb {
+      transform: scale(1.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    input[type="range"]:focus-visible::-moz-range-thumb {
+      box-shadow: 0 0 0 2px var(--status-bg), 0 0 0 4px var(--accent);
+    }
+
+    /* Remove Firefox dotted outline */
+    input[type="range"]::-moz-focus-outer {
+      border: 0;
     }
 
     .panel-credit {
@@ -353,7 +460,7 @@
       display: flex;
       align-items: center;
       gap: 0.65rem;
-      padding: 0.38rem 0.85rem;
+      padding: 0.32rem 0.5rem 0.32rem 0.75rem;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 0.78rem;
       color: var(--text);
@@ -378,14 +485,43 @@
       box-shadow: 0 6px 22px rgba(0, 0, 0, 0.12);
     }
 
+    .status-cluster {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .status-actions {
+      gap: 6px;
+    }
+
     .status-item {
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.35rem;
     }
 
     #stats {
       color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    #save-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.38rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #save-status::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-saved);
+      flex-shrink: 0;
+      transition: background-color 0.2s ease, opacity 0.2s ease;
     }
 
     #save-status.saving {
@@ -393,14 +529,38 @@
       font-weight: 500;
     }
 
+    #save-status.saving::before {
+      background: var(--color-saving);
+      animation: pulse-dot 1.2s infinite ease-in-out;
+    }
+
     #save-status.saved {
       color: var(--color-saved);
       font-weight: 500;
     }
 
+    #save-status.saved::before {
+      background: var(--color-saved);
+    }
+
     #save-status.error {
-      color: var(--color-saving);
+      color: #ef4444;
       font-weight: 600;
+    }
+
+    #save-status.error::before {
+      background: #ef4444;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.35;
+        transform: scale(0.8);
+      }
     }
 
     #storage-warning {
@@ -417,21 +577,35 @@
     }
 
     .btn-action {
-      background: none;
-      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
       color: var(--text);
       opacity: 0.82;
       cursor: pointer;
+      font-family: inherit;
       font-size: 0.78rem;
-      padding: 0.2rem 0.15rem;
+      line-height: 1;
+      padding: 0.24rem 0.45rem;
       text-decoration: none;
-      transition: opacity 0.15s ease, color 0.15s ease;
+      transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
       touch-action: manipulation;
     }
 
-    .btn-action:hover {
+    .btn-action:hover,
+    .btn-action:focus-visible,
+    .btn-action[aria-expanded="true"] {
       opacity: 1;
-      color: var(--accent);
+      color: var(--text);
+      background: var(--panel-inner-bg);
+    }
+
+    #palette-btn {
+      padding: 0.16rem 0.28rem;
     }
 
     #appearance-btn {
@@ -441,17 +615,25 @@
     }
 
     .settings-icon {
-      font-size: 0.95rem;
-      line-height: 1;
+      width: 14px;
+      height: 14px;
       display: inline-block;
-      vertical-align: -1px;
+      vertical-align: middle;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    #appearance-btn:hover .settings-icon,
+    #appearance-btn[aria-expanded="true"] .settings-icon {
+      transform: rotate(30deg);
     }
 
     .divider {
       width: 1px;
-      height: 10px;
+      height: 12px;
       background: var(--status-border);
       flex-shrink: 0;
+      opacity: 0.85;
     }
 
     /* Palette button in status bar */
@@ -468,7 +650,7 @@
       line-height: 1.1;
       font-weight: 500;
       color: var(--text);
-      opacity: 0.85;
+      opacity: 0.9;
       transition: all 0.15s ease;
     }
 
@@ -533,8 +715,11 @@
     }
 
     .palette-search-icon {
-      font-size: 0.95rem;
+      width: 14px;
+      height: 14px;
       opacity: 0.6;
+      flex-shrink: 0;
+      display: inline-block;
     }
 
     #palette-input {
@@ -580,13 +765,14 @@
     }
 
     .palette-item-icon {
-      width: 28px;
+      width: 34px;
       height: 28px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.74rem;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.68rem;
+      letter-spacing: -0.01em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-weight: 600;
       color: var(--accent);
       background: var(--panel-inner-bg);
@@ -687,8 +873,24 @@
 
       #status-bar {
         bottom: max(0.85rem, env(safe-area-inset-bottom, 0.85rem));
-        padding: 0.34rem 0.65rem;
+        padding: 0.28rem 0.45rem 0.28rem 0.6rem;
         gap: 0.45rem;
+      }
+
+      .status-cluster {
+        gap: 0.45rem;
+      }
+
+      .status-actions {
+        gap: 4px;
+      }
+
+      .btn-action {
+        padding: 0.2rem 0.35rem;
+      }
+
+      #palette-btn {
+        padding: 0.14rem 0.22rem;
       }
 
       #settings-panel {
@@ -700,8 +902,8 @@
       }
 
       .settings-icon {
-        font-size: 1.05rem;
-        line-height: 1;
+        width: 15px;
+        height: 15px;
       }
     }
   </style>
@@ -721,7 +923,10 @@
   <div id="palette-backdrop" role="dialog" aria-modal="true" aria-label="Command Palette">
     <div id="palette-modal">
       <div class="palette-search-wrapper">
-        <span class="palette-search-icon" aria-hidden="true">⚡</span>
+        <svg class="palette-search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
         <input
           id="palette-input"
           type="text"
@@ -749,17 +954,30 @@
         <span>Theme</span>
       </div>
       <div class="theme-segmented" role="radiogroup" aria-label="Theme selection">
-        <button type="button" class="theme-opt" data-theme-val="auto" role="radio" aria-checked="true" title="System theme">
-          <span>🌓</span> System
+        <button type="button" class="theme-opt" data-theme-val="auto" role="radio" aria-checked="true" title="Auto (System) theme">
+          <svg class="theme-glyph" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor" stroke="none"/>
+          </svg>
+          Auto
         </button>
         <button type="button" class="theme-opt" data-theme-val="light" role="radio" aria-checked="false" title="Light theme">
-          <span>☀️</span> Light
+          <svg class="theme-glyph" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+          Light
         </button>
         <button type="button" class="theme-opt" data-theme-val="dark" role="radio" aria-checked="false" title="Dark theme">
-          <span>🌙</span> Dark
+          <svg class="theme-glyph" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" fill="currentColor" stroke="none"/>
+          </svg>
+          Dark
         </button>
         <button type="button" class="theme-opt" data-theme-val="midnight" role="radio" aria-checked="false" title="Midnight OLED theme">
-          <span>🌑</span> Midnight
+          <svg class="theme-glyph" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="currentColor"/>
+          </svg>
+          Midnight
         </button>
       </div>
     </div>
@@ -807,30 +1025,33 @@
 
   <!-- Status Bar -->
   <div id="status-bar" aria-live="polite">
-    <span class="status-item" id="save-status">Loading...</span>
+    <div class="status-cluster status-left">
+      <span class="status-item saved" id="save-status">Saved</span>
+      <span class="status-item" id="stats">0 words · 0 chars</span>
+    </div>
     <span class="divider"></span>
-    <span class="status-item" id="stats">0 words</span>
-    <span class="divider"></span>
-    <button class="btn-action" id="download-btn" title="Download note as .txt (Cmd/Ctrl+S)">Download</button>
-    <span class="divider"></span>
-    <button class="btn-action" id="palette-btn" title="Command Palette (⌘K)" aria-haspopup="dialog" aria-expanded="false">
-      <span class="cmd-badge" id="palette-hint-text">⌘K</span>
-    </button>
-    <span class="divider"></span>
-    <button class="btn-action" id="appearance-btn" title="Settings" aria-haspopup="true" aria-expanded="false">
-      <span class="desktop-only">Settings</span>
-      <span class="settings-icon" aria-hidden="true">⚙</span>
-    </button>
-    <span class="divider desktop-only"></span>
-    <a
-      href="https://github.com/bobinx/inka"
-      target="_blank"
-      rel="noopener noreferrer"
-      id="brand-badge"
-      class="desktop-only"
-      title="Inka on GitHub"
-      aria-label="Inka on GitHub"
-    ><span class="badge-key">inka</span><span class="badge-val">github</span></a>
+    <div class="status-cluster status-actions">
+      <button class="btn-action" id="download-btn" title="Download note as .txt (Cmd/Ctrl+S)">Download</button>
+      <button class="btn-action" id="palette-btn" title="Command Palette (⌘K)" aria-haspopup="dialog" aria-expanded="false">
+        <span class="cmd-badge" id="palette-hint-text">⌘K</span>
+      </button>
+      <button class="btn-action" id="appearance-btn" title="Settings" aria-haspopup="true" aria-expanded="false">
+        <span class="desktop-only">Settings</span>
+        <svg class="settings-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+      <a
+        href="https://github.com/bobinx/inka"
+        target="_blank"
+        rel="noopener noreferrer"
+        id="brand-badge"
+        class="desktop-only"
+        title="Inka on GitHub"
+        aria-label="Inka on GitHub"
+      ><span class="badge-key">inka</span><span class="badge-val">github</span></a>
+    </div>
   </div>
 
   <script>
@@ -1344,7 +1565,7 @@
       {
         id: 'json-prettify',
         title: 'JSON Prettify',
-        desc: 'Format highlighted JSON with 2-space indentation',
+        desc: 'Format JSON with 2-space indentation',
         keywords: 'json format pretty beautify indent',
         icon: '{}',
         run: (text) => JSON.stringify(JSON.parse(text), null, 2)
@@ -1352,7 +1573,7 @@
       {
         id: 'json-minify',
         title: 'JSON Minify',
-        desc: 'Compact highlighted JSON into a single line',
+        desc: 'Compact JSON into a single line',
         keywords: 'json minify compact compress',
         icon: '→|',
         run: (text) => JSON.stringify(JSON.parse(text))
@@ -1360,41 +1581,41 @@
       {
         id: 'b64-encode',
         title: 'Base64 Encode',
-        desc: 'Encode highlighted text to Base64',
+        desc: 'e.g. hello → aGVsbG8=',
         keywords: 'base64 b64 encode text',
-        icon: '🔒',
+        icon: 'B64',
         run: (text) => btoa(unescape(encodeURIComponent(text)))
       },
       {
         id: 'b64-decode',
         title: 'Base64 Decode',
-        desc: 'Decode highlighted Base64 string to text',
+        desc: 'e.g. aGVsbG8= → hello',
         keywords: 'base64 b64 decode decrypt text',
-        icon: '🔓',
+        icon: 'TXT',
         run: (text) => decodeURIComponent(escape(atob(text.trim())))
       },
       {
         id: 'url-encode',
         title: 'URL Encode',
-        desc: 'Encode URI components (%20 format)',
+        desc: 'e.g. hello world → hello%20world',
         keywords: 'url uri encode escape link',
-        icon: '🔗',
+        icon: 'URL',
         run: (text) => encodeURIComponent(text)
       },
       {
         id: 'url-decode',
         title: 'URL Decode',
-        desc: 'Decode encoded URL string',
+        desc: 'e.g. hello%20world → hello world',
         keywords: 'url uri decode unescape link',
-        icon: '🌐',
+        icon: 'URI',
         run: (text) => decodeURIComponent(text)
       },
       {
         id: 'jwt-decode',
         title: 'JWT Decode',
-        desc: 'Decode token header and payload offline',
+        desc: 'Decode token header & payload offline',
         keywords: 'jwt token bearer decode auth',
-        icon: '🎫',
+        icon: 'JWT',
         run: (text) => {
           const parts = text.trim().split('.');
           if (parts.length < 2) throw new Error('Invalid JWT');
@@ -1409,9 +1630,9 @@
       {
         id: 'ts-to-utc',
         title: 'Epoch Timestamp to ISO UTC',
-        desc: 'Convert Unix epoch timestamp to ISO 8601 string',
+        desc: 'e.g. 1700000000 → 2023-11-14T22:13:20Z',
         keywords: 'timestamp epoch unix utc iso date time',
-        icon: '⏱️',
+        icon: 'ISO',
         run: (text) => {
           const num = Number(text.trim());
           if (isNaN(num)) throw new Error('Invalid timestamp');
@@ -1422,9 +1643,9 @@
       {
         id: 'utc-to-ts',
         title: 'ISO Date to Epoch Timestamp',
-        desc: 'Convert ISO date string to Unix epoch timestamp',
+        desc: 'e.g. 2023-11-14 → 1700000000',
         keywords: 'date iso utc to unix epoch timestamp',
-        icon: '📅',
+        icon: 'SEC',
         run: (text) => {
           const ms = Date.parse(text.trim());
           if (isNaN(ms)) throw new Error('Invalid date');
@@ -1434,7 +1655,7 @@
       {
         id: 'dec-to-hex',
         title: 'Decimal to Hex',
-        desc: 'Convert decimal number to hex (0x...)',
+        desc: 'e.g. 255 → 0xFF',
         keywords: 'dec decimal hex hexadecimal base convert',
         icon: '0x',
         run: (text) => {
@@ -1446,7 +1667,7 @@
       {
         id: 'hex-to-dec',
         title: 'Hex to Decimal',
-        desc: 'Convert 0x... or hex to decimal number',
+        desc: 'e.g. 0xFF → 255',
         keywords: 'hex hexadecimal to dec decimal base parse',
         icon: '10',
         run: (text) => {
@@ -1460,7 +1681,7 @@
       {
         id: 'dec-to-bin',
         title: 'Decimal to Binary',
-        desc: 'Convert decimal number to binary (0b...)',
+        desc: 'e.g. 42 → 0b101010',
         keywords: 'dec decimal bin binary base convert',
         icon: '0b',
         run: (text) => {
@@ -1472,7 +1693,7 @@
       {
         id: 'bin-to-dec',
         title: 'Binary to Decimal',
-        desc: 'Convert 0b... or binary to decimal number',
+        desc: 'e.g. 0b101010 → 42',
         keywords: 'bin binary to dec decimal base parse',
         icon: '01',
         run: (text) => {
@@ -1486,7 +1707,7 @@
       {
         id: 'case-camel',
         title: 'Transform to camelCase',
-        desc: 'Convert highlighted text to camelCase',
+        desc: 'e.g. inkaAppNotes',
         keywords: 'case camel camelCase string transform',
         icon: 'aB',
         run: (text) => text.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, c) => c.toUpperCase())
@@ -1494,7 +1715,7 @@
       {
         id: 'case-snake',
         title: 'Transform to snake_case',
-        desc: 'Convert highlighted text to snake_case',
+        desc: 'e.g. inka_app_notes',
         keywords: 'case snake snake_case string transform',
         icon: 'a_b',
         run: (text) => text.replace(/([a-z])([A-Z])/g, '$1_$2').replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase()
@@ -1502,15 +1723,23 @@
       {
         id: 'case-kebab',
         title: 'Transform to kebab-case',
-        desc: 'Convert highlighted text to kebab-case',
+        desc: 'e.g. inka-app-notes',
         keywords: 'case kebab kebab-case slug transform',
         icon: 'a-b',
         run: (text) => text.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()
       },
       {
+        id: 'case-title',
+        title: 'Transform to Title Case',
+        desc: 'e.g. Inka App Notes',
+        keywords: 'case title titlecase headline capitalize transform',
+        icon: 'Aa',
+        run: (text) => text.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+      },
+      {
         id: 'case-upper',
         title: 'Transform to UPPERCASE',
-        desc: 'Convert highlighted text to uppercase',
+        desc: 'e.g. INKA APP NOTES',
         keywords: 'case upper uppercase capital',
         icon: 'AA',
         run: (text) => text.toUpperCase()
@@ -1518,7 +1747,7 @@
       {
         id: 'case-lower',
         title: 'Transform to lowercase',
-        desc: 'Make highlighted text lowercase',
+        desc: 'e.g. inka app notes',
         keywords: 'case lower lowercase small',
         icon: 'aa',
         run: (text) => text.toLowerCase()
@@ -1526,33 +1755,49 @@
       {
         id: 'lines-sort',
         title: 'Sort Lines',
-        desc: 'Sort highlighted lines alphabetically (A to Z)',
-        keywords: 'sort lines order alphabetize asc',
-        icon: '⇅',
+        desc: 'Sort lines alphabetically (A → Z)',
+        keywords: 'sort lines order alphabetize asc a-z',
+        icon: 'A-Z',
         run: (text) => text.split('\n').sort((a, b) => a.localeCompare(b)).join('\n')
       },
       {
-        id: 'lines-dedup',
+        id: 'lines-reverse',
+        title: 'Reverse Lines',
+        desc: 'Invert line order from top to bottom',
+        keywords: 'lines reverse invert order flip rev',
+        icon: 'REV',
+        run: (text) => text.split('\n').reverse().join('\n')
+      },
+      {
+        id: 'lines-unique',
         title: 'Deduplicate Lines',
-        desc: 'Remove duplicate lines from highlighted text',
-        keywords: 'dedup duplicate unique lines clean',
-        icon: '⊜',
+        desc: 'Filter out duplicate lines',
+        keywords: 'dedup duplicate unique lines clean distinct uniq',
+        icon: 'UNIQ',
         run: (text) => [...new Set(text.split('\n'))].join('\n')
       },
       {
         id: 'lines-clean',
         title: 'Remove Empty Lines',
-        desc: 'Strip blank lines from highlighted text',
-        keywords: 'clean empty strip blank lines',
-        icon: '⌫',
+        desc: 'Remove empty or blank lines',
+        keywords: 'clean empty strip blank lines delete remove',
+        icon: 'DEL',
         run: (text) => text.split('\n').filter(l => l.trim().length > 0).join('\n')
+      },
+      {
+        id: 'lines-trim',
+        title: 'Trim Lines',
+        desc: 'Strip leading and trailing whitespace',
+        keywords: 'trim whitespace strip leading trailing lines clean',
+        icon: 'TRIM',
+        run: (text) => text.split('\n').map(l => l.trim()).join('\n')
       },
       {
         id: 'eval-math',
         title: 'Evaluate Math Expression (=)',
-        desc: 'Compute highlighted expression and append = result',
+        desc: 'e.g. (12 * 4) + 2 = 50',
         keywords: 'eval math calculate compute solve expression =',
-        icon: '=',
+        icon: 'CALC',
         run: (text) => {
           let expr = text.trim();
           if (expr.endsWith('=')) {
@@ -1585,38 +1830,38 @@
         }
       },
       {
-        id: 'gen-uuid',
+        id: 'insert-uuid',
         title: 'Insert UUID v4',
-        desc: 'Insert random crypto UUID at caret or selection',
+        desc: 'Generate random UUID v4',
         keywords: 'uuid guid random id generate insert',
-        icon: '🆔',
+        icon: 'UUID',
         allowEmptySelection: true,
         run: () => crypto.randomUUID()
       },
       {
-        id: 'gen-epoch',
+        id: 'insert-epoch',
         title: 'Insert Current Epoch Timestamp',
-        desc: 'Insert Unix epoch timestamp in seconds',
-        keywords: 'now timestamp epoch unix seconds time current insert',
-        icon: '⏱️',
+        desc: 'Insert Unix seconds since epoch',
+        keywords: 'now timestamp epoch unix seconds time current insert sec',
+        icon: 'SEC',
         allowEmptySelection: true,
         run: () => Math.floor(Date.now() / 1000).toString()
       },
       {
-        id: 'gen-timestamp',
+        id: 'insert-timestamp',
         title: 'Insert Current UTC Timestamp',
-        desc: 'Insert UTC timestamp (YYYY-MM-DD HH:mm:ss)',
-        keywords: 'now timestamp utc time current datetime insert',
-        icon: '🕒',
+        desc: 'Insert ISO 8601 UTC timestamp',
+        keywords: 'now timestamp utc time current datetime iso insert 8601',
+        icon: 'ISO',
         allowEmptySelection: true,
-        run: () => new Date().toISOString().replace('T', ' ').slice(0, 19)
+        run: () => new Date().toISOString()
       },
       {
-        id: 'gen-date',
+        id: 'insert-date',
         title: 'Insert Current UTC Date',
         desc: 'Insert current UTC date (YYYY-MM-DD)',
-        keywords: 'date utc today current day calendar insert',
-        icon: '📅',
+        keywords: 'date utc today current day calendar insert yyyy-mm-dd',
+        icon: 'DATE',
         allowEmptySelection: true,
         run: () => new Date().toISOString().slice(0, 10)
       }
