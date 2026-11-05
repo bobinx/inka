@@ -1060,6 +1060,174 @@
     updateStorageWarning();
     checkEmptyState();
 
+    // History Manager for Undo / Redo (cross-browser, fully reliable in Safari, Brave, Chrome, Firefox)
+    const historyStack = [];
+    let historyIndex = -1;
+    const MAX_HISTORY = 100;
+    let historyDebounceTimeout = null;
+
+    function getSelectionOffsets(el) {
+      if (typeof window === 'undefined' || !window.getSelection || !el) return { start: 0, end: 0 };
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return { start: 0, end: 0 };
+      try {
+        const range = sel.getRangeAt(0);
+        if (!range || (!el.contains && el !== range.commonAncestorContainer) || (el.contains && !el.contains(range.commonAncestorContainer) && el !== range.commonAncestorContainer)) {
+          return { start: 0, end: 0 };
+        }
+        if (!range.cloneRange || typeof document === 'undefined') return { start: 0, end: 0 };
+        const preStart = range.cloneRange();
+        preStart.selectNodeContents(el);
+        preStart.setEnd(range.startContainer, range.startOffset);
+        const start = preStart.toString().length;
+
+        const preEnd = range.cloneRange();
+        preEnd.selectNodeContents(el);
+        preEnd.setEnd(range.endContainer, range.endOffset);
+        const end = preEnd.toString().length;
+
+        return { start, end };
+      } catch (_) {
+        return { start: 0, end: 0 };
+      }
+    }
+
+    function setSelectionOffsets(el, start, end) {
+      if (typeof window === 'undefined' || !window.getSelection || typeof document === 'undefined' || !document.createRange || !el) return;
+      const sel = window.getSelection();
+      if (!sel) return;
+      try {
+        const range = document.createRange();
+        let current = 0;
+        let startNode = null, startOffset = 0;
+        let endNode = null, endOffset = 0;
+
+        function walk(node) {
+          if (!node) return;
+          if (node.nodeType === 3) {
+            const next = current + node.length;
+            if (!startNode && start >= current && start <= next) {
+              startNode = node;
+              startOffset = start - current;
+            }
+            if (!endNode && end >= current && end <= next) {
+              endNode = node;
+              endOffset = end - current;
+            }
+            current = next;
+          } else if (node.childNodes) {
+            for (let i = 0; i < node.childNodes.length; i++) {
+              walk(node.childNodes[i]);
+            }
+          }
+        }
+        walk(el);
+
+        if (startNode && endNode) {
+          range.setStart(startNode, startOffset);
+          range.setEnd(endNode, endOffset);
+        } else if (range.selectNodeContents && range.collapse) {
+          range.selectNodeContents(el);
+          range.collapse(false);
+        }
+        if (sel.removeAllRanges && sel.addRange) {
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      } catch (_) {}
+    }
+
+    function pushHistory(immediate = false) {
+      if (!editor) return;
+      const currentText = editor.innerText;
+      const offsets = getSelectionOffsets(editor);
+
+      const doPush = () => {
+        if (historyIndex >= 0 && historyStack[historyIndex] && historyStack[historyIndex].text === currentText) {
+          historyStack[historyIndex].start = offsets.start;
+          historyStack[historyIndex].end = offsets.end;
+          return;
+        }
+        if (historyIndex < historyStack.length - 1) {
+          historyStack.splice(historyIndex + 1);
+        }
+        historyStack.push({ text: currentText, start: offsets.start, end: offsets.end });
+        if (historyStack.length > MAX_HISTORY) {
+          historyStack.shift();
+        }
+        historyIndex = historyStack.length - 1;
+      };
+
+      if (immediate) {
+        if (historyDebounceTimeout) {
+          clearTimeout(historyDebounceTimeout);
+          historyDebounceTimeout = null;
+        }
+        doPush();
+      } else {
+        if (historyDebounceTimeout) clearTimeout(historyDebounceTimeout);
+        historyDebounceTimeout = setTimeout(() => {
+          historyDebounceTimeout = null;
+          doPush();
+        }, 350);
+      }
+    }
+
+    function undo() {
+      if (!editor) return false;
+      if (historyDebounceTimeout) {
+        clearTimeout(historyDebounceTimeout);
+        historyDebounceTimeout = null;
+        const currentText = editor.innerText;
+        if (historyIndex >= 0 && historyStack[historyIndex] && historyStack[historyIndex].text !== currentText) {
+          const offsets = getSelectionOffsets(editor);
+          historyStack.push({ text: currentText, start: offsets.start, end: offsets.end });
+          historyIndex = historyStack.length - 1;
+        }
+      }
+
+      if (historyIndex > 0) {
+        historyIndex--;
+        const state = historyStack[historyIndex];
+        editor.innerText = state.text;
+        if (editor.focus) editor.focus();
+        setSelectionOffsets(editor, state.start, state.end);
+        noteDirty = true;
+        checkEmptyState();
+        saveContent();
+        updateStats();
+        return true;
+      }
+      if (editor.focus) editor.focus();
+      if (typeof document !== 'undefined' && document.execCommand) {
+        try { document.execCommand('undo'); } catch (_) {}
+      }
+      return false;
+    }
+
+    function redo() {
+      if (!editor) return false;
+      if (historyIndex < historyStack.length - 1) {
+        historyIndex++;
+        const state = historyStack[historyIndex];
+        editor.innerText = state.text;
+        if (editor.focus) editor.focus();
+        setSelectionOffsets(editor, state.start, state.end);
+        noteDirty = true;
+        checkEmptyState();
+        saveContent();
+        updateStats();
+        return true;
+      }
+      if (editor.focus) editor.focus();
+      if (typeof document !== 'undefined' && document.execCommand) {
+        try { document.execCommand('redo'); } catch (_) {}
+      }
+      return false;
+    }
+
+    pushHistory(true);
+
     function updateStats() {
       const text = getNormalizedText();
       const words = text.trim() ? text.trim().split(/\s+/).filter(Boolean).length : 0;
@@ -1100,16 +1268,21 @@
       checkEmptyState();
       saveContent();
       updateStats();
+      pushHistory(false);
     });
 
     editor.addEventListener('keydown', (e) => {
       if (e.key === 'Tab') {
         e.preventDefault();
-        document.execCommand('insertText', false, '    ');
+        pushHistory(true);
+        if (document.execCommand) {
+          document.execCommand('insertText', false, '    ');
+        }
         noteDirty = true;
         checkEmptyState();
         saveContent();
         updateStats();
+        pushHistory(true);
       }
 
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
@@ -1121,12 +1294,16 @@
 
     editor.addEventListener('paste', (e) => {
       e.preventDefault();
+      pushHistory(true);
       const text = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
-      document.execCommand('insertText', false, text);
+      if (document.execCommand) {
+        document.execCommand('insertText', false, text);
+      }
       noteDirty = true;
       checkEmptyState();
       saveContent();
       updateStats();
+      pushHistory(true);
     });
 
     // Cross-tab sync
@@ -1668,6 +1845,8 @@
       // Restore focus and selection to editor BEFORE execCommand
       restoreSelection();
 
+      pushHistory(true);
+
       try {
         const result = tool.run(selectedText);
         if (typeof result === 'string') {
@@ -1676,6 +1855,7 @@
           checkEmptyState();
           saveContent();
           updateStats();
+          pushHistory(true);
         }
       } catch (err) {
         if (tool.onError) {
@@ -1767,27 +1947,19 @@
         closePalette();
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
         const isPaletteOpen = paletteBackdrop && paletteBackdrop.classList && paletteBackdrop.classList.contains('open');
-        if (!isPaletteOpen && document.activeElement !== editor) {
-          if (editor) {
-            editor.focus();
-            if (document.execCommand) {
-              if (e.shiftKey) {
-                document.execCommand('redo');
-              } else {
-                document.execCommand('undo');
-              }
-            }
+        if (!isPaletteOpen) {
+          if (e.preventDefault) e.preventDefault();
+          if (e.shiftKey) {
+            redo();
+          } else {
+            undo();
           }
         }
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') {
         const isPaletteOpen = paletteBackdrop && paletteBackdrop.classList && paletteBackdrop.classList.contains('open');
-        if (!isPaletteOpen && document.activeElement !== editor) {
-          if (editor) {
-            editor.focus();
-            if (document.execCommand) {
-              document.execCommand('redo');
-            }
-          }
+        if (!isPaletteOpen) {
+          if (e.preventDefault) e.preventDefault();
+          redo();
         }
       }
     });
