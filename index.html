@@ -1,18 +1,18 @@
 <!--
-   ╦  ╦╔═╗╦  ╦  ╦ ╦╔╦╗
-   ╚╗╔╝║╣ ║  ║  ║ ║║║║
-    ╚╝ ╚═╝╩═╝╩═╝╚═╝╩ ╩
+   ╦ ╔╗╔ ╦╔═ ╔═╗
+   ║ ║║║ ╠╩╗ ╠═╣
+   ╩ ╝╚╝ ╩ ╩ ╩ ╩
    A quiet page that remembers.
    No signups, no downloads.
-   Crafted with care by bobinx · https://github.com/bobinx/vellum
+   Crafted with care by bobinx · https://github.com/bobinx/inka
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Vellum - A quiet page that remembers. A browser notepad with no signups and no downloads.">
-  <title>Vellum</title>
+  <meta name="description" content="Inka - A quiet page that remembers. A browser notepad with no signups and no downloads.">
+  <title>Inka</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
   <style>
     :root {
@@ -709,7 +709,7 @@
   ></div>
 
   <!-- Command Palette Modal -->
-  <div id="palette-backdrop" class="palette-backdrop" role="dialog" aria-modal="true" aria-label="Command Palette">
+  <div id="palette-backdrop" role="dialog" aria-modal="true" aria-label="Command Palette">
     <div id="palette-modal">
       <div class="palette-search-wrapper">
         <span class="palette-search-icon" aria-hidden="true">⚡</span>
@@ -814,30 +814,30 @@
     </button>
     <span class="divider desktop-only"></span>
     <a
-      href="https://github.com/bobinx/vellum"
+      href="https://github.com/bobinx/inka"
       target="_blank"
       rel="noopener noreferrer"
       id="brand-badge"
       class="desktop-only"
-      title="Vellum on GitHub"
-      aria-label="Vellum on GitHub"
-    ><span class="badge-key">vellum</span><span class="badge-val">github</span></a>
+      title="Inka on GitHub"
+      aria-label="Inka on GitHub"
+    ><span class="badge-key">inka</span><span class="badge-val">github</span></a>
   </div>
 
   <script>
     // Easter egg
     console.log(
-      '%c📜 Vellum %c- A quiet page that remembers.\n%cNo signups, no downloads · Stored locally in your browser.\n%cCrafted with care by bobinx · https://github.com/bobinx/vellum',
+      '%c📜 Inka %c- A quiet page that remembers.\n%cNo signups, no downloads · Stored locally in your browser.\n%cCrafted with care by bobinx · https://github.com/bobinx/inka',
       'font-size: 13px; font-weight: bold; color: #2563eb;',
       'font-size: 12px; color: #71717a;',
       'font-size: 11px; color: #a1a1aa;',
       'font-size: 10px; color: #a1a1aa;'
     );
 
-    const STORAGE_KEY = 'vellum_notes';
-    const THEME_KEY = 'vellum_theme';
-    const MARGIN_KEY = 'vellum_margin';
-    const FONT_SIZE_KEY = 'vellum_font_size';
+    const STORAGE_KEY = 'inka_notes';
+    const THEME_KEY = 'inka_theme';
+    const MARGIN_KEY = 'inka_margin';
+    const FONT_SIZE_KEY = 'inka_font_size';
 
     const editor = document.getElementById('editor');
     const saveStatus = document.getElementById('save-status');
@@ -908,7 +908,7 @@
       'Words fly, what is written remains.',
       'Paper has more patience than people.'
     ];
-    const PH_INDEX_KEY = 'vellum_placeholder_index';
+    const PH_INDEX_KEY = 'inka_placeholder_index';
     try {
       const lastIdx = parseInt(localStorage.getItem(PH_INDEX_KEY), 10);
       const nextIdx = Number.isInteger(lastIdx) ? (lastIdx + 1) % PLACEHOLDERS.length : 0;
@@ -1043,7 +1043,7 @@
       if (!sel || sel.rangeCount === 0) return { start: 0, end: 0 };
       try {
         const range = sel.getRangeAt(0);
-        if (!range || (!el.contains && el !== range.commonAncestorContainer) || (el.contains && !el.contains(range.commonAncestorContainer) && el !== range.commonAncestorContainer)) {
+        if (!range || (el !== range.commonAncestorContainer && (!el.contains || !el.contains(range.commonAncestorContainer)))) {
           return { start: 0, end: 0 };
         }
         if (!range.cloneRange || typeof document === 'undefined') return { start: 0, end: 0 };
@@ -1305,7 +1305,7 @@
       const blob = new Blob([editor.innerText], { type: 'text/plain;charset=utf-8' });
       const now = new Date();
       const timestamp = now.toISOString().slice(0, 10);
-      const filename = `vellum-${timestamp}.txt`;
+      const filename = `inka-${timestamp}.txt`;
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = filename;
@@ -1536,7 +1536,6 @@
         desc: 'Strip blank lines from highlighted text',
         keywords: 'clean empty strip blank lines',
         icon: '⌫',
-        allowEmptySelection: false,
         run: (text) => text.split('\n').filter(l => l.trim().length > 0).join('\n')
       },
       {
@@ -1545,7 +1544,6 @@
         desc: 'Compute highlighted expression and append = result',
         keywords: 'eval math calculate compute solve expression =',
         icon: '=',
-        allowEmptySelection: false,
         run: (text) => {
           let expr = text.trim();
           if (expr.endsWith('=')) {
@@ -1644,7 +1642,7 @@
             return '';
           }
           let text = '';
-          if (range && typeof range.toString === 'function') {
+          if (typeof range.toString === 'function') {
             const rText = range.toString();
             if (rText && !rText.startsWith('[object ')) text = rText;
           }

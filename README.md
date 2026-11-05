@@ -1,6 +1,12 @@
-# Vellum
+# Inka
 
-[https://bobinx.github.io/vellum/](https://bobinx.github.io/vellum/)
+```
+╦ ╔╗╔ ╦╔═ ╔═╗
+║ ║║║ ╠╩╗ ╠═╣
+╩ ╝╚╝ ╩ ╩ ╩ ╩
+```
+
+[https://bobinx.github.io/inka/](https://bobinx.github.io/inka/)
 
 A quiet page that remembers. A browser notepad with no signups and no downloads.
 
@@ -12,7 +18,7 @@ data:text/html,<body contenteditable style="font:2rem monospace;padding:2rem">
 
 ## How to Use
 
-Drag this link to your bookmarks bar for quick access: [**Vellum**](https://bobinx.github.io/vellum/)
+Drag this link to your bookmarks bar for quick access: [**Inka**](https://bobinx.github.io/inka/)
 
 Or open the page and press <kbd>Cmd</kbd> + <kbd>D</kbd> (Mac) or <kbd>Ctrl</kbd> + <kbd>D</kbd> (Windows/Linux).
 
@@ -24,7 +30,7 @@ Or open the page and press <kbd>Cmd</kbd> + <kbd>D</kbd> (Mac) or <kbd>Ctrl</kbd
 - **Cross-tab sync:** Notes sync across open tabs and windows in real time.
 - **Plain text export:** Download your note anytime as a `.txt` file with <kbd>Cmd</kbd> / <kbd>Ctrl</kbd> + <kbd>S</kbd>.
 
-If browser storage is blocked or full, Vellum shows a warning and keeps editing and download available. Download a backup before closing; unsaved changes are only in the open page. If existing notes cannot be read, Vellum won't overwrite them during that visit. Reload to retry reading them.
+If browser storage is blocked or full, Inka shows a warning and keeps editing and download available. Download a backup before closing; unsaved changes are only in the open page. If existing notes cannot be read, Inka won't overwrite them during that visit. Reload to retry reading them.
 
 ## Shortcuts
 
@@ -34,11 +40,11 @@ If browser storage is blocked or full, Vellum shows a warning and keeps editing 
 
 ## Run Locally
 
-Vellum is a single self-contained HTML file with no build steps or dependencies:
+Inka is a single self-contained HTML file with no build steps or dependencies:
 
 ```bash
-git clone https://github.com/bobinx/vellum.git
-open vellum/index.html
+git clone https://github.com/bobinx/inka.git
+open inka/index.html
 ```
 
 ## License
