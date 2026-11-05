@@ -1945,5 +1945,16 @@
       sel.addRange(range);
     }
   </script>
+  <!-- Cloudflare Web Analytics (only injected when hosted on GitHub Pages) -->
+  <script>
+    if (window.location.hostname === 'bobinx.github.io') {
+      const beacon = document.createElement('script');
+      beacon.type = 'module';
+      beacon.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+      beacon.setAttribute('data-cf-beacon', '{"token": "5b6939927ab1447eab6381af3e603a2d"}');
+      document.body.appendChild(beacon);
+    }
+  </script>
+  <!-- End Cloudflare Web Analytics -->
 </body>
 </html>
