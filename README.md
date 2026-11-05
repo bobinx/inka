@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Views](https://hits.sh/github.com/bobinx/inka.svg?label=views&color=2563eb)](https://hits.sh/github.com/bobinx/inka/)
 
-[**Open App →**](https://bobinx.github.io/inka/)
+[**Open Inka →**](https://bobinx.github.io/inka/) · Drag [**Inka**](https://bobinx.github.io/inka/) to your bookmarks bar for one-click access.
 
 ---
 
