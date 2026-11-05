@@ -469,6 +469,197 @@
       flex-shrink: 0;
     }
 
+    /* Palette button in status bar */
+    .cmd-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 0.72rem;
+      padding: 0.12rem 0.35rem;
+      border-radius: 4px;
+      background: var(--panel-inner-bg);
+      border: 1px solid var(--status-border);
+      line-height: 1.1;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 0.15s ease;
+    }
+
+    #palette-btn:hover .cmd-badge,
+    #palette-btn:focus-visible .cmd-badge {
+      color: var(--text);
+      border-color: var(--muted);
+    }
+
+    /* Command Palette Modal */
+    #palette-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 200;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: clamp(2.5rem, 14vh, 7rem);
+      padding-left: 1rem;
+      padding-right: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    #palette-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #palette-modal {
+      width: 100%;
+      max-width: 480px;
+      background: var(--status-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--status-border);
+      border-radius: 14px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      transform: translateY(-4px);
+      transition: transform 0.15s ease;
+    }
+
+    #palette-backdrop.open #palette-modal {
+      transform: translateY(0);
+    }
+
+    .palette-search-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--status-border);
+    }
+
+    .palette-search-icon {
+      font-size: 0.95rem;
+      opacity: 0.6;
+    }
+
+    #palette-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 0.92rem;
+      color: var(--text);
+    }
+
+    #palette-input::placeholder {
+      color: var(--muted);
+      opacity: 0.75;
+    }
+
+    .palette-list {
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 0.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      list-style: none;
+      margin: 0;
+    }
+
+    .palette-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.5rem 0.65rem;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.1s ease;
+    }
+
+    .palette-item.active {
+      background: var(--opt-active-bg);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .palette-item-icon {
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--panel-inner-bg);
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+
+    .palette-item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .palette-item-title {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .palette-item-desc {
+      font-size: 0.71rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .palette-empty {
+      padding: 1.5rem 1rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .palette-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.45rem 0.9rem;
+      border-top: 1px solid var(--status-border);
+      font-size: 0.7rem;
+      color: var(--muted);
+      background: var(--panel-inner-bg);
+      user-select: none;
+    }
+
+    .palette-footer kbd {
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      padding: 0.08rem 0.28rem;
+      background: var(--opt-active-bg);
+      border: 1px solid var(--status-border);
+      border-radius: 3px;
+      font-size: 0.68rem;
+    }
+
     /* Mobile adjustments */
     @media (max-width: 640px) {
       #editor {
@@ -506,6 +697,31 @@
     autofocus
     data-placeholder="Begin anywhere."
   ></div>
+
+  <!-- Command Palette Modal -->
+  <div id="palette-backdrop" class="palette-backdrop" role="dialog" aria-modal="true" aria-label="Command Palette">
+    <div id="palette-modal">
+      <div class="palette-search-wrapper">
+        <span class="palette-search-icon" aria-hidden="true">⚡</span>
+        <input
+          id="palette-input"
+          type="text"
+          placeholder="Type a tool or command..."
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </div>
+      <div id="palette-list" class="palette-list" role="listbox"></div>
+      <div class="palette-footer">
+        <span id="palette-selection-status">Highlight text to transform</span>
+        <div style="display: flex; gap: 0.5rem;">
+          <span><kbd>↑</kbd><kbd>↓</kbd></span>
+          <span><kbd>↵</kbd></span>
+          <span><kbd>esc</kbd></span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Settings Popover -->
   <div id="settings-panel" aria-label="Settings" role="dialog">
@@ -585,6 +801,10 @@
     <span class="divider"></span>
     <button class="btn-action" id="download-btn" title="Download note as .txt (Cmd/Ctrl+S)">Download</button>
     <span class="divider"></span>
+    <button class="btn-action" id="palette-btn" title="Command Palette (⌘K)" aria-haspopup="dialog" aria-expanded="false">
+      <span class="cmd-badge" id="palette-hint-text">⌘K</span>
+    </button>
+    <span class="divider"></span>
     <button class="btn-action" id="appearance-btn" title="Settings" aria-haspopup="true" aria-expanded="false">
       <span class="desktop-only">Settings</span>
       <span class="settings-icon" aria-hidden="true">⚙</span>
@@ -627,6 +847,12 @@
     const fontSizeValDisplay = document.getElementById('font-size-val-display');
     const themeButtons = document.querySelectorAll('.theme-opt');
     const storageWarning = document.getElementById('storage-warning');
+    const paletteBtn = document.getElementById('palette-btn');
+    const paletteBackdrop = document.getElementById('palette-backdrop');
+    const paletteInput = document.getElementById('palette-input');
+    const paletteList = document.getElementById('palette-list');
+    const paletteHintText = document.getElementById('palette-hint-text');
+    const paletteSelectionStatus = document.getElementById('palette-selection-status');
 
     let noteReadFailed = false;
     let noteWriteFailed = false;
@@ -906,6 +1132,422 @@
     }
 
     downloadBtn.addEventListener('click', downloadNote);
+
+    // Command Palette
+    const isMac = typeof navigator !== 'undefined' && /Mac|iP(hone|od|ad)/i.test(navigator.platform || navigator.userAgent || '');
+    const shortcutLabel = isMac ? '⌘K' : 'Ctrl+K';
+    if (paletteBtn) paletteBtn.title = `Command Palette (${shortcutLabel})`;
+    if (paletteHintText) paletteHintText.textContent = shortcutLabel;
+
+    let savedSelectionRange = null;
+    let activePaletteIndex = 0;
+    let filteredTools = [];
+
+    const TOOLS = [
+      {
+        id: 'json-prettify',
+        title: 'JSON Prettify',
+        desc: 'Format highlighted JSON with 2-space indentation',
+        keywords: 'json format pretty beautify indent',
+        icon: '{ }',
+        run: (text) => JSON.stringify(JSON.parse(text), null, 2)
+      },
+      {
+        id: 'json-minify',
+        title: 'JSON Minify',
+        desc: 'Compact highlighted JSON into a single line',
+        keywords: 'json minify compact compress',
+        icon: '→|',
+        run: (text) => JSON.stringify(JSON.parse(text))
+      },
+      {
+        id: 'b64-encode',
+        title: 'Base64 Encode',
+        desc: 'Encode highlighted text to Base64',
+        keywords: 'base64 b64 encode text',
+        icon: '🔒',
+        run: (text) => btoa(unescape(encodeURIComponent(text)))
+      },
+      {
+        id: 'b64-decode',
+        title: 'Base64 Decode',
+        desc: 'Decode highlighted Base64 string to text',
+        keywords: 'base64 b64 decode decrypt text',
+        icon: '🔓',
+        run: (text) => decodeURIComponent(escape(atob(text.trim())))
+      },
+      {
+        id: 'url-encode',
+        title: 'URL Encode',
+        desc: 'Encode URI components (%20 format)',
+        keywords: 'url uri encode escape link',
+        icon: '🔗',
+        run: (text) => encodeURIComponent(text)
+      },
+      {
+        id: 'url-decode',
+        title: 'URL Decode',
+        desc: 'Decode encoded URL string',
+        keywords: 'url uri decode unescape link',
+        icon: '🌐',
+        run: (text) => decodeURIComponent(text)
+      },
+      {
+        id: 'jwt-decode',
+        title: 'JWT Decode',
+        desc: 'Decode token header and payload offline',
+        keywords: 'jwt token bearer decode auth',
+        icon: '🎫',
+        run: (text) => {
+          const parts = text.trim().split('.');
+          if (parts.length < 2) throw new Error('Invalid JWT');
+          const decodePart = (p) => {
+            const b64 = p.replace(/-/g, '+').replace(/_/g, '/');
+            const padded = b64.padEnd(b64.length + (4 - b64.length % 4) % 4, '=');
+            return JSON.parse(decodeURIComponent(escape(atob(padded))));
+          };
+          return JSON.stringify({ header: decodePart(parts[0]), payload: decodePart(parts[1]) }, null, 2);
+        }
+      },
+      {
+        id: 'ts-to-utc',
+        title: 'Timestamp to ISO UTC',
+        desc: 'Convert epoch timestamp to ISO 8601 string',
+        keywords: 'timestamp epoch utc iso date time',
+        icon: '⏱️',
+        run: (text) => {
+          const num = Number(text.trim());
+          if (isNaN(num)) throw new Error('Invalid timestamp');
+          const ms = num < 1e11 ? num * 1000 : num;
+          return new Date(ms).toISOString();
+        }
+      },
+      {
+        id: 'utc-to-ts',
+        title: 'Date to Timestamp',
+        desc: 'Convert ISO date string to Unix timestamp',
+        keywords: 'date iso utc to unix epoch timestamp',
+        icon: '📅',
+        run: (text) => {
+          const ms = Date.parse(text.trim());
+          if (isNaN(ms)) throw new Error('Invalid date');
+          return Math.floor(ms / 1000).toString();
+        }
+      },
+      {
+        id: 'dec-to-hex-bin',
+        title: 'Dec to Hex / Binary',
+        desc: 'Convert decimal number to hex and binary',
+        keywords: 'dec decimal hex bin binary base convert',
+        icon: '01',
+        run: (text) => {
+          const num = parseInt(text.trim(), 10);
+          if (isNaN(num)) throw new Error('Invalid number');
+          return `0x${num.toString(16).toUpperCase()} (0b${num.toString(2)})`;
+        }
+      },
+      {
+        id: 'hex-bin-to-dec',
+        title: 'Hex / Binary to Dec',
+        desc: 'Convert 0x... or 0b... to decimal',
+        keywords: 'hex bin to dec decimal base parse',
+        icon: '10',
+        run: (text) => {
+          const clean = text.trim();
+          let num;
+          if (clean.startsWith('0x') || clean.startsWith('0X')) num = parseInt(clean, 16);
+          else if (clean.startsWith('0b') || clean.startsWith('0B')) num = parseInt(clean.slice(2), 2);
+          else num = parseInt(clean, 16);
+          if (isNaN(num)) throw new Error('Invalid hex/bin');
+          return num.toString(10);
+        }
+      },
+      {
+        id: 'case-camel',
+        title: 'Transform to camelCase',
+        desc: 'Convert highlighted text to camelCase',
+        keywords: 'case camel camelCase string transform',
+        icon: 'aB',
+        run: (text) => text.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, c) => c.toUpperCase())
+      },
+      {
+        id: 'case-snake',
+        title: 'Transform to snake_case',
+        desc: 'Convert highlighted text to snake_case',
+        keywords: 'case snake snake_case string transform',
+        icon: 'a_b',
+        run: (text) => text.replace(/([a-z])([A-Z])/g, '$1_$2').replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase()
+      },
+      {
+        id: 'case-kebab',
+        title: 'Transform to kebab-case',
+        desc: 'Convert highlighted text to kebab-case',
+        keywords: 'case kebab kebab-case slug transform',
+        icon: 'a-b',
+        run: (text) => text.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()
+      },
+      {
+        id: 'case-upper',
+        title: 'Transform to UPPERCASE',
+        desc: 'Convert highlighted text to uppercase',
+        keywords: 'case upper uppercase capital',
+        icon: 'AA',
+        run: (text) => text.toUpperCase()
+      },
+      {
+        id: 'case-lower',
+        title: 'Transform to lowercase',
+        desc: 'Make highlighted text lowercase',
+        keywords: 'case lower lowercase small',
+        icon: 'aa',
+        run: (text) => text.toLowerCase()
+      },
+      {
+        id: 'lines-sort',
+        title: 'Sort Lines',
+        desc: 'Sort highlighted lines alphabetically (A to Z)',
+        keywords: 'sort lines order alphabetize asc',
+        icon: '⇅',
+        run: (text) => text.split('\n').sort((a, b) => a.localeCompare(b)).join('\n')
+      },
+      {
+        id: 'lines-dedup',
+        title: 'Deduplicate Lines',
+        desc: 'Remove duplicate lines from highlighted text',
+        keywords: 'dedup duplicate unique lines clean',
+        icon: '⊜',
+        run: (text) => [...new Set(text.split('\n'))].join('\n')
+      },
+      {
+        id: 'lines-clean',
+        title: 'Remove Empty Lines',
+        desc: 'Strip blank lines from highlighted text',
+        keywords: 'clean empty strip blank lines',
+        icon: '⌫',
+        run: (text) => text.split('\n').filter(l => l.trim().length > 0).join('\n')
+      },
+      {
+        id: 'gen-uuid',
+        title: 'Replace with UUID v4',
+        desc: 'Replace highlighted text with a random UUID',
+        keywords: 'uuid guid random id generate',
+        icon: '🆔',
+        run: () => crypto.randomUUID()
+      },
+      {
+        id: 'gen-now',
+        title: 'Replace with Current Timestamp',
+        desc: 'Replace highlighted text with ISO timestamp',
+        keywords: 'now timestamp date time today current',
+        icon: '🕒',
+        run: () => new Date().toISOString().replace('T', ' ').slice(0, 16)
+      }
+    ];
+
+    function saveSelection() {
+      const sel = (typeof window !== 'undefined' && window.getSelection) ? window.getSelection() : null;
+      if (sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        if (!range.collapsed && editor && editor.contains(range.commonAncestorContainer)) {
+          savedSelectionRange = range.cloneRange();
+          return range.toString();
+        }
+      }
+      savedSelectionRange = null;
+      return '';
+    }
+
+    function restoreSelection() {
+      if (savedSelectionRange && typeof window !== 'undefined' && window.getSelection) {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(savedSelectionRange);
+      } else if (editor) {
+        editor.focus();
+      }
+    }
+
+    function renderPaletteList(query = '') {
+      const q = query.trim().toLowerCase();
+      filteredTools = TOOLS.filter(tool => {
+        if (!q) return true;
+        return tool.title.toLowerCase().includes(q) ||
+               tool.desc.toLowerCase().includes(q) ||
+               tool.keywords.toLowerCase().includes(q);
+      });
+
+      activePaletteIndex = 0;
+      if (!paletteList) return;
+
+      if (filteredTools.length === 0) {
+        paletteList.innerHTML = '<div class="palette-empty">No matching tools found</div>';
+        return;
+      }
+
+      paletteList.innerHTML = filteredTools.map((tool, idx) => `
+        <div class="palette-item ${idx === 0 ? 'active' : ''}" data-index="${idx}" role="option" aria-selected="${idx === 0}">
+          <span class="palette-item-icon">${tool.icon}</span>
+          <div class="palette-item-info">
+            <span class="palette-item-title">${tool.title}</span>
+            <span class="palette-item-desc">${tool.desc}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateActivePaletteItem() {
+      if (!paletteList) return;
+      const items = paletteList.querySelectorAll ? paletteList.querySelectorAll('.palette-item') : (paletteList.children || []);
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const isActive = i === activePaletteIndex;
+        if (item.classList) item.classList.toggle('active', isActive);
+        if (item.setAttribute) item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        if (isActive && item.scrollIntoView) {
+          item.scrollIntoView({ block: 'nearest' });
+        }
+      }
+    }
+
+    function openPalette() {
+      if (settingsPanel && settingsPanel.classList.contains('open')) {
+        settingsPanel.classList.remove('open');
+        appearanceBtn.setAttribute('aria-expanded', 'false');
+      }
+      const selectedText = saveSelection();
+      if (paletteSelectionStatus) {
+        if (selectedText) {
+          const len = selectedText.length;
+          paletteSelectionStatus.textContent = `Selection: ${len} character${len === 1 ? '' : 's'}`;
+        } else {
+          paletteSelectionStatus.textContent = 'No text selected (highlight text to transform)';
+        }
+      }
+      if (paletteInput) paletteInput.value = '';
+      renderPaletteList('');
+      if (paletteBackdrop && paletteBackdrop.classList) {
+        paletteBackdrop.classList.toggle('open', true);
+      }
+      if (paletteBtn && paletteBtn.setAttribute) {
+        paletteBtn.setAttribute('aria-expanded', 'true');
+      }
+      setTimeout(() => {
+        if (paletteInput && paletteInput.focus) paletteInput.focus();
+      }, 30);
+    }
+
+    function closePalette() {
+      if (paletteBackdrop && paletteBackdrop.classList) {
+        paletteBackdrop.classList.remove('open');
+      }
+      if (paletteBtn && paletteBtn.setAttribute) {
+        paletteBtn.setAttribute('aria-expanded', 'false');
+      }
+      restoreSelection();
+    }
+
+    function executeTool(tool) {
+      if (!savedSelectionRange) {
+        // If no text is highlighted, do nothing
+        closePalette();
+        return;
+      }
+
+      restoreSelection();
+      const selectedText = savedSelectionRange.toString();
+      if (!selectedText) {
+        closePalette();
+        return;
+      }
+
+      try {
+        const result = tool.run(selectedText);
+        if (typeof result === 'string' && result !== selectedText) {
+          document.execCommand('insertText', false, result);
+          noteDirty = true;
+          checkEmptyState();
+          saveContent();
+          updateStats();
+        }
+      } catch (err) {
+        console.warn('Transformation failed:', err);
+      }
+
+      closePalette();
+    }
+
+    if (paletteList) {
+      paletteList.addEventListener('click', (e) => {
+        const target = e.target;
+        const item = target && target.closest ? target.closest('.palette-item') : null;
+        if (item && item.getAttribute) {
+          const idx = parseInt(item.getAttribute('data-index'), 10);
+          if (filteredTools[idx]) executeTool(filteredTools[idx]);
+        }
+      });
+    }
+
+    if (paletteBtn) {
+      paletteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (paletteBackdrop && paletteBackdrop.classList.contains('open')) {
+          closePalette();
+        } else {
+          openPalette();
+        }
+      });
+    }
+
+    if (paletteBackdrop) {
+      paletteBackdrop.addEventListener('click', (e) => {
+        if (e.target === paletteBackdrop) {
+          closePalette();
+        }
+      });
+    }
+
+    if (paletteInput) {
+      paletteInput.addEventListener('input', (e) => {
+        renderPaletteList(e.target.value);
+      });
+
+      paletteInput.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (filteredTools.length > 0) {
+            activePaletteIndex = (activePaletteIndex + 1) % filteredTools.length;
+            updateActivePaletteItem();
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (filteredTools.length > 0) {
+            activePaletteIndex = (activePaletteIndex - 1 + filteredTools.length) % filteredTools.length;
+            updateActivePaletteItem();
+          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (filteredTools[activePaletteIndex]) {
+            executeTool(filteredTools[activePaletteIndex]);
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          closePalette();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (paletteBackdrop && paletteBackdrop.classList.contains('open')) {
+          closePalette();
+        } else {
+          openPalette();
+        }
+      } else if (e.key === 'Escape' && paletteBackdrop && paletteBackdrop.classList.contains('open')) {
+        closePalette();
+      }
+    });
 
     updateStats();
     editor.focus();
