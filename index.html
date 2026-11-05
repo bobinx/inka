@@ -1358,12 +1358,13 @@
     }
 
     function restoreSelection() {
+      if (editor) {
+        editor.focus();
+      }
       if (savedSelectionRange && typeof window !== 'undefined' && window.getSelection) {
         const sel = window.getSelection();
         sel.removeAllRanges();
         sel.addRange(savedSelectionRange);
-      } else if (editor) {
-        editor.focus();
       }
     }
 
@@ -1444,6 +1445,7 @@
         paletteBtn.setAttribute('aria-expanded', 'false');
       }
       restoreSelection();
+      savedSelectionRange = null;
     }
 
     function executeTool(tool) {
@@ -1453,12 +1455,22 @@
         return;
       }
 
-      restoreSelection();
       const selectedText = savedSelectionRange.toString();
       if (!selectedText) {
         closePalette();
         return;
       }
+
+      // Close modal backdrop first so paletteInput is blurred
+      if (paletteBackdrop && paletteBackdrop.classList) {
+        paletteBackdrop.classList.remove('open');
+      }
+      if (paletteBtn && paletteBtn.setAttribute) {
+        paletteBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      // Restore focus and selection to editor BEFORE execCommand
+      restoreSelection();
 
       try {
         const result = tool.run(selectedText);
@@ -1473,7 +1485,13 @@
         console.warn('Transformation failed:', err);
       }
 
-      closePalette();
+      // Invalidate savedSelectionRange so it cannot be re-applied
+      savedSelectionRange = null;
+
+      // Ensure editor remains focused
+      if (editor) {
+        editor.focus();
+      }
     }
 
     if (paletteList) {
@@ -1546,6 +1564,30 @@
         }
       } else if (e.key === 'Escape' && paletteBackdrop && paletteBackdrop.classList.contains('open')) {
         closePalette();
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+        const isPaletteOpen = paletteBackdrop && paletteBackdrop.classList && paletteBackdrop.classList.contains('open');
+        if (!isPaletteOpen && document.activeElement !== editor) {
+          if (editor) {
+            editor.focus();
+            if (document.execCommand) {
+              if (e.shiftKey) {
+                document.execCommand('redo');
+              } else {
+                document.execCommand('undo');
+              }
+            }
+          }
+        }
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') {
+        const isPaletteOpen = paletteBackdrop && paletteBackdrop.classList && paletteBackdrop.classList.contains('open');
+        if (!isPaletteOpen && document.activeElement !== editor) {
+          if (editor) {
+            editor.focus();
+            if (document.execCommand) {
+              document.execCommand('redo');
+            }
+          }
+        }
       }
     });
 
