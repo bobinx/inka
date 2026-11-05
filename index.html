@@ -1273,30 +1273,54 @@
         }
       },
       {
-        id: 'dec-to-hex-bin',
-        title: 'Dec to Hex / Binary',
-        desc: 'Convert decimal number to hex and binary',
-        keywords: 'dec decimal hex bin binary base convert',
-        icon: '01',
+        id: 'dec-to-hex',
+        title: 'Decimal to Hex',
+        desc: 'Convert decimal number to hex (0x...)',
+        keywords: 'dec decimal hex hexadecimal base convert',
+        icon: '0x',
         run: (text) => {
           const num = parseInt(text.trim(), 10);
           if (isNaN(num)) throw new Error('Invalid number');
-          return `0x${num.toString(16).toUpperCase()} (0b${num.toString(2)})`;
+          return `0x${num.toString(16).toUpperCase()}`;
         }
       },
       {
-        id: 'hex-bin-to-dec',
-        title: 'Hex / Binary to Dec',
-        desc: 'Convert 0x... or 0b... to decimal',
-        keywords: 'hex bin to dec decimal base parse',
+        id: 'hex-to-dec',
+        title: 'Hex to Decimal',
+        desc: 'Convert 0x... or hex to decimal number',
+        keywords: 'hex hexadecimal to dec decimal base parse',
         icon: '10',
         run: (text) => {
           const clean = text.trim();
-          let num;
-          if (clean.startsWith('0x') || clean.startsWith('0X')) num = parseInt(clean, 16);
-          else if (clean.startsWith('0b') || clean.startsWith('0B')) num = parseInt(clean.slice(2), 2);
-          else num = parseInt(clean, 16);
-          if (isNaN(num)) throw new Error('Invalid hex/bin');
+          const hex = clean.startsWith('0x') || clean.startsWith('0X') ? clean.slice(2) : clean;
+          const num = parseInt(hex, 16);
+          if (isNaN(num)) throw new Error('Invalid hex');
+          return num.toString(10);
+        }
+      },
+      {
+        id: 'dec-to-bin',
+        title: 'Decimal to Binary',
+        desc: 'Convert decimal number to binary (0b...)',
+        keywords: 'dec decimal bin binary base convert',
+        icon: '0b',
+        run: (text) => {
+          const num = parseInt(text.trim(), 10);
+          if (isNaN(num)) throw new Error('Invalid number');
+          return `0b${num.toString(2)}`;
+        }
+      },
+      {
+        id: 'bin-to-dec',
+        title: 'Binary to Decimal',
+        desc: 'Convert 0b... or binary to decimal number',
+        keywords: 'bin binary to dec decimal base parse',
+        icon: '01',
+        run: (text) => {
+          const clean = text.trim();
+          const bin = clean.startsWith('0b') || clean.startsWith('0B') ? clean.slice(2) : clean;
+          const num = parseInt(bin, 2);
+          if (isNaN(num)) throw new Error('Invalid binary');
           return num.toString(10);
         }
       },
@@ -1367,7 +1391,7 @@
       },
       {
         id: 'eval-math',
-        title: 'Evaluate Math Expression',
+        title: 'Evaluate Math Expression (=)',
         desc: 'Compute highlighted expression and append = result',
         keywords: 'eval math calculate compute solve expression =',
         icon: '= ',
