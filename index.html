@@ -593,18 +593,20 @@
     }
 
     .palette-item-icon {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.82rem;
+      font-size: 0.74rem;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-weight: 600;
       color: var(--accent);
       background: var(--panel-inner-bg);
-      border-radius: 5px;
+      border-radius: 6px;
       flex-shrink: 0;
+      white-space: nowrap;
+      line-height: 1;
     }
 
     .palette-item-info {
@@ -1187,7 +1189,7 @@
         title: 'JSON Prettify',
         desc: 'Format highlighted JSON with 2-space indentation',
         keywords: 'json format pretty beautify indent',
-        icon: '{ }',
+        icon: '{}',
         run: (text) => JSON.stringify(JSON.parse(text), null, 2)
       },
       {
@@ -1394,7 +1396,7 @@
         title: 'Evaluate Math Expression (=)',
         desc: 'Compute highlighted expression and append = result',
         keywords: 'eval math calculate compute solve expression =',
-        icon: '= ',
+        icon: '=',
         allowEmptySelection: false,
         run: (text) => {
           let expr = text.trim();
