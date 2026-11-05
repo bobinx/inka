@@ -1448,13 +1448,38 @@
       }, duration);
     }
 
+    let savedSelectedText = '';
+
     function saveSelection() {
       const sel = (typeof window !== 'undefined' && window.getSelection) ? window.getSelection() : null;
       if (sel && sel.rangeCount > 0) {
         const range = sel.getRangeAt(0);
         if (range && editor && (editor === range.commonAncestorContainer || (editor.contains && editor.contains(range.commonAncestorContainer)))) {
           savedSelectionRange = range.cloneRange ? range.cloneRange() : range;
-          return (range.collapsed || typeof range.toString !== 'function') ? '' : range.toString();
+          if (range.collapsed) {
+            savedSelectedText = '';
+            return '';
+          }
+          let text = '';
+          if (range && typeof range.toString === 'function') {
+            const rText = range.toString();
+            if (rText && !rText.startsWith('[object ')) text = rText;
+          }
+          if (typeof sel.toString === 'function') {
+            const sText = sel.toString();
+            if (sText && !sText.startsWith('[object ')) text = sText;
+          }
+          if (range.cloneContents && typeof document !== 'undefined' && document.createElement) {
+            try {
+              const div = document.createElement('div');
+              div.appendChild(range.cloneContents());
+              if (div.innerText && !div.innerText.startsWith('[object ')) {
+                text = div.innerText;
+              }
+            } catch (_) {}
+          }
+          savedSelectedText = text.replace(/\r\n/g, '\n');
+          return savedSelectedText;
         }
       }
       if (editor) {
@@ -1468,6 +1493,7 @@
       } else {
         savedSelectionRange = null;
       }
+      savedSelectedText = '';
       return '';
     }
 
@@ -1560,12 +1586,35 @@
       }
       restoreSelection();
       savedSelectionRange = null;
+      savedSelectedText = '';
+    }
+
+    function insertTextPreservingLines(text) {
+      if (!text.includes('\n')) {
+        if (document.execCommand) {
+          document.execCommand('insertText', false, text);
+        }
+        return;
+      }
+      const lines = text.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        if (i > 0) {
+          if (document.execCommand) {
+            document.execCommand('insertLineBreak');
+          }
+        }
+        if (lines[i].length > 0) {
+          if (document.execCommand) {
+            document.execCommand('insertText', false, lines[i]);
+          }
+        }
+      }
     }
 
     function executeTool(tool) {
       let selectedText = '';
-      if (savedSelectionRange && typeof savedSelectionRange.toString === 'function' && !savedSelectionRange.collapsed) {
-        selectedText = savedSelectionRange.toString();
+      if (savedSelectionRange && !savedSelectionRange.collapsed) {
+        selectedText = savedSelectedText || (typeof savedSelectionRange.toString === 'function' ? savedSelectionRange.toString() : '');
       }
 
       if (!tool.allowEmptySelection && !selectedText) {
@@ -1588,9 +1637,7 @@
       try {
         const result = tool.run(selectedText);
         if (typeof result === 'string') {
-          if (document.execCommand) {
-            document.execCommand('insertText', false, result);
-          }
+          insertTextPreservingLines(result);
           noteDirty = true;
           checkEmptyState();
           saveContent();
@@ -1606,6 +1653,7 @@
 
       // Invalidate savedSelectionRange so it cannot be re-applied
       savedSelectionRange = null;
+      savedSelectedText = '';
 
       // Ensure editor remains focused
       if (editor) {
