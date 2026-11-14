@@ -23,8 +23,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Validate syntax
-        run: node -e "const fs = require('fs'); const html = fs.readFileSync('index.html', 'utf8'); new Function(html.match(/<script>([\s\S]*?)<\/script>/)[1]);"
+      - name: Validate inline script syntax
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const vm = require('node:vm');
+          const html = fs.readFileSync('index.html', 'utf8');
+          for (const [, source] of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
+            new vm.Script(source);
+          }
+          NODE
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

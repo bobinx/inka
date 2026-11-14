@@ -34,27 +34,6 @@
       --editor-pad-x: clamp(1.25rem, calc(var(--margin-slider, 20) * 1vw), calc(50vw - 140px));
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]):not([data-theme="midnight"]) {
-        --bg: #121214;
-        --text: #e4e4e7;
-        --muted: #71717a;
-        --accent: #60a5fa;
-        --selection: #2563eb;
-        --selection-text: #ffffff;
-        --status-bg: rgba(24, 24, 27, 0.92);
-        --status-border: #27272a;
-        --panel-inner-bg: #1f1f23;
-        --opt-active-bg: #2e2e34;
-        --opt-active-text: #fafafa;
-        --color-saving: #f59e0b;
-        --color-saved: #22c55e;
-        --badge-key-bg: #27272a;
-        --badge-key-text: #d4d4d8;
-        --badge-val-bg: #3b82f6;
-      }
-    }
-
     :root[data-theme="dark"] {
       --bg: #121214;
       --text: #e4e4e7;
@@ -177,6 +156,10 @@
       white-space: pre-wrap;
       word-break: break-word;
       outline: none;
+      background: transparent;
+      color: inherit;
+      resize: none;
+      overflow: hidden;
       caret-color: var(--accent);
       border: none;
       transition: padding-left 0.12s ease-out, padding-right 0.12s ease-out;
@@ -188,16 +171,9 @@
       color: var(--selection-text);
     }
 
-    #editor.is-empty::before {
-      content: attr(data-placeholder);
+    #editor::placeholder {
       color: var(--muted);
-      pointer-events: none;
-      position: absolute;
-      top: 2.5rem;
-      left: var(--editor-pad-x);
-      right: var(--editor-pad-x);
       opacity: 0.7;
-      transition: left 0.12s ease-out, right 0.12s ease-out;
     }
 
     /* Glassmorphism surfaces */
@@ -878,13 +854,13 @@
 <body>
   <div id="toast" role="status" aria-live="polite"></div>
   <p id="storage-warning" role="status" hidden></p>
-  <div
+  <textarea
     id="editor"
-    contenteditable="plaintext-only"
+    aria-label="Notes"
     spellcheck="true"
     autofocus
-    data-placeholder="Begin anywhere."
-  ></div>
+    placeholder="Begin anywhere."
+  ></textarea>
 
   <!-- Command Palette Modal -->
   <div id="palette-backdrop" role="dialog" aria-modal="true" aria-label="Command Palette">
@@ -1114,21 +1090,19 @@
       const lastIdx = parseInt(localStorage.getItem(PH_INDEX_KEY), 10);
       const nextIdx = Number.isInteger(lastIdx) ? (lastIdx + 1) % PLACEHOLDERS.length : 0;
       localStorage.setItem(PH_INDEX_KEY, nextIdx.toString());
-      editor.setAttribute('data-placeholder', PLACEHOLDERS[nextIdx]);
+      editor.setAttribute('placeholder', PLACEHOLDERS[nextIdx]);
     } catch (_) {
-      editor.setAttribute('data-placeholder', PLACEHOLDERS[0]);
+      editor.setAttribute('placeholder', PLACEHOLDERS[0]);
     }
 
     // Theme
     let currentTheme = readPreference(THEME_KEY) || 'auto';
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
 
     function applyTheme(theme) {
       currentTheme = theme;
-      if (theme === 'auto') {
-        document.documentElement.removeAttribute('data-theme');
-      } else {
-        document.documentElement.setAttribute('data-theme', theme);
-      }
+      const resolved = theme === 'auto' ? (systemTheme.matches ? 'dark' : 'light') : theme;
+      document.documentElement.setAttribute('data-theme', resolved);
       themeButtons.forEach((btn) => {
         const isMatch = btn.getAttribute('data-theme-val') === theme;
         btn.classList.toggle('active', isMatch);
@@ -1145,6 +1119,7 @@
     });
 
     applyTheme(currentTheme);
+    systemTheme.addEventListener('change', () => applyTheme(currentTheme));
 
     // Sliders
     function bindSlider(slider, key, varName, defaultVal, unit = '', displayEl = null) {
@@ -1152,16 +1127,18 @@
         document.documentElement.style.setProperty(varName, `${val}${unit}`);
         slider.value = val;
         if (displayEl) displayEl.textContent = `${val}${unit}`;
+        refreshEditor();
       };
       apply(readPreference(key) || defaultVal);
       slider.addEventListener('input', (e) => {
         writePreference(key, e.target.value);
         apply(e.target.value);
       });
+      return apply;
     }
 
-    bindSlider(marginSlider, MARGIN_KEY, '--margin-slider', '20');
-    bindSlider(fontSizeSlider, FONT_SIZE_KEY, '--font-size', '20', 'px', fontSizeValDisplay);
+    const applyMargin = bindSlider(marginSlider, MARGIN_KEY, '--margin-slider', '20');
+    const applyFontSize = bindSlider(fontSizeSlider, FONT_SIZE_KEY, '--font-size', '20', 'px', fontSizeValDisplay);
 
     // Settings panel
     function toggleSettings(open = !settingsPanel.classList.contains('open')) {
@@ -1180,187 +1157,97 @@
       if (e.key === 'Escape' && settingsPanel.classList.contains('open')) toggleSettings(false);
     });
 
-    // Editor content & stats
-    function getNormalizedText() {
-      const raw = editor.innerText.replace(/\r\n/g, '\n');
-      return (raw === '' || raw === '\n') ? '' : (raw.endsWith('\n') ? raw.slice(0, -1) : raw);
-    }
-
-    function checkEmptyState() {
-      const raw = editor.innerText.replace(/\r\n/g, '\n');
-      editor.classList.toggle('is-empty', raw === '' || raw === '\n');
+    // Plain text is the document model; textarea offsets are its selection model.
+    function refreshEditor() {
+      const { scrollX, scrollY } = window;
+      editor.style.height = 'auto';
+      editor.style.height = `${editor.scrollHeight}px`;
+      window.scrollTo(scrollX, scrollY);
+      const text = editor.value;
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      const chars = text.length;
+      stats.textContent = `${words} word${words === 1 ? '' : 's'} · ${chars} char${chars === 1 ? '' : 's'}`;
     }
 
     try {
       const savedContent = localStorage.getItem(STORAGE_KEY);
-      if (savedContent !== null) editor.innerText = savedContent;
+      if (savedContent !== null) editor.value = savedContent;
       setSaveStatus('Saved', 'saved');
     } catch (_) {
       noteReadFailed = true;
       setSaveStatus('Not saved', 'error');
     }
     updateStorageWarning();
-    checkEmptyState();
 
-    // History Manager (Safari/Brave undo stack)
     const historyStack = [];
     let historyIndex = -1;
     const MAX_HISTORY = 100;
-    let historyDebounceTimeout = null;
+    let pendingHistory = null;
 
-    function getSelectionOffsets(el) {
-      const sel = window.getSelection?.();
-      if (!sel || sel.rangeCount === 0 || !el) return { start: 0, end: 0 };
-      try {
-        const range = sel.getRangeAt(0);
-        if (!range || (el !== range.commonAncestorContainer && !el.contains?.(range.commonAncestorContainer))) {
-          return { start: 0, end: 0 };
-        }
-        const preStart = range.cloneRange();
-        preStart.selectNodeContents(el);
-        preStart.setEnd(range.startContainer, range.startOffset);
-
-        const preEnd = range.cloneRange();
-        preEnd.selectNodeContents(el);
-        preEnd.setEnd(range.endContainer, range.endOffset);
-
-        return { start: preStart.toString().length, end: preEnd.toString().length };
-      } catch (_) {
-        return { start: 0, end: 0 };
+    function commitHistory(state) {
+      clearTimeout(pendingHistory?.timeout);
+      pendingHistory = null;
+      if (historyStack[historyIndex]?.text === state.text) {
+        historyStack[historyIndex] = state;
+        return;
       }
-    }
-
-    function setSelectionOffsets(el, start, end) {
-      const sel = window.getSelection?.();
-      if (!sel || !el || !document.createRange) return;
-      try {
-        const range = document.createRange();
-        let current = 0;
-        let startNode = null, startOffset = 0;
-        let endNode = null, endOffset = 0;
-
-        function walk(node) {
-          if (!node) return;
-          if (node.nodeType === 3) {
-            const next = current + node.length;
-            if (!startNode && start >= current && start <= next) {
-              startNode = node;
-              startOffset = start - current;
-            }
-            if (!endNode && end >= current && end <= next) {
-              endNode = node;
-              endOffset = end - current;
-            }
-            current = next;
-          } else if (node.childNodes) {
-            for (let i = 0; i < node.childNodes.length; i++) walk(node.childNodes[i]);
-          }
-        }
-        walk(el);
-
-        if (startNode && endNode) {
-          range.setStart(startNode, startOffset);
-          range.setEnd(endNode, endOffset);
-        } else {
-          range.selectNodeContents(el);
-          range.collapse(false);
-        }
-        sel.removeAllRanges();
-        sel.addRange(range);
-      } catch (_) {}
-    }
-
-    function flushDebouncedHistory() {
-      if (historyDebounceTimeout) {
-        clearTimeout(historyDebounceTimeout);
-        historyDebounceTimeout = null;
-        const currentText = editor.innerText;
-        if (historyIndex >= 0 && historyStack[historyIndex] && historyStack[historyIndex].text !== currentText) {
-          const offsets = getSelectionOffsets(editor);
-          historyStack.push({ text: currentText, start: offsets.start, end: offsets.end });
-          historyIndex = historyStack.length - 1;
-        }
-      }
+      historyStack.splice(historyIndex + 1);
+      historyStack.push(state);
+      if (historyStack.length > MAX_HISTORY) historyStack.shift();
+      historyIndex = historyStack.length - 1;
     }
 
     function pushHistory(immediate = false) {
-      if (!editor) return;
-      const currentText = editor.innerText;
-      const offsets = getSelectionOffsets(editor);
-
-      const doPush = () => {
-        if (historyIndex >= 0 && historyStack[historyIndex]?.text === currentText) {
-          historyStack[historyIndex].start = offsets.start;
-          historyStack[historyIndex].end = offsets.end;
-          return;
-        }
-        if (historyIndex < historyStack.length - 1) {
-          historyStack.splice(historyIndex + 1);
-        }
-        historyStack.push({ text: currentText, start: offsets.start, end: offsets.end });
-        if (historyStack.length > MAX_HISTORY) historyStack.shift();
-        historyIndex = historyStack.length - 1;
+      const state = {
+        text: editor.value,
+        start: editor.selectionStart,
+        end: editor.selectionEnd,
+        direction: editor.selectionDirection
       };
+      clearTimeout(pendingHistory?.timeout);
+      if (immediate) commitHistory(state);
+      else pendingHistory = { state, timeout: setTimeout(flushDebouncedHistory, 350) };
+    }
 
-      if (immediate) {
-        if (historyDebounceTimeout) {
-          clearTimeout(historyDebounceTimeout);
-          historyDebounceTimeout = null;
-        }
-        doPush();
-      } else {
-        if (historyDebounceTimeout) clearTimeout(historyDebounceTimeout);
-        historyDebounceTimeout = setTimeout(() => {
-          historyDebounceTimeout = null;
-          doPush();
-        }, 350);
-      }
+    function flushDebouncedHistory() {
+      if (pendingHistory) commitHistory(pendingHistory.state);
+    }
+
+    function documentChanged() {
+      noteDirty = true;
+      refreshEditor();
+      saveContent();
     }
 
     function restoreHistoryState(state) {
-      editor.innerText = state.text;
-      editor.focus?.();
-      setSelectionOffsets(editor, state.start, state.end);
-      noteDirty = true;
-      checkEmptyState();
-      saveContent();
-      updateStats();
+      editor.value = state.text;
+      editor.focus();
+      editor.setSelectionRange(state.start, state.end, state.direction);
+      documentChanged();
     }
 
     function undo() {
-      if (!editor) return false;
       flushDebouncedHistory();
-      if (historyIndex > 0) {
-        historyIndex--;
-        restoreHistoryState(historyStack[historyIndex]);
-        return true;
-      }
-      editor.focus?.();
-      try { document.execCommand?.('undo'); } catch (_) {}
-      return false;
+      if (historyIndex === 0) return false;
+      restoreHistoryState(historyStack[--historyIndex]);
+      return true;
     }
 
     function redo() {
-      if (!editor) return false;
       flushDebouncedHistory();
-      if (historyIndex < historyStack.length - 1) {
-        historyIndex++;
-        restoreHistoryState(historyStack[historyIndex]);
-        return true;
-      }
-      editor.focus?.();
-      try { document.execCommand?.('redo'); } catch (_) {}
-      return false;
+      if (historyIndex === historyStack.length - 1) return false;
+      restoreHistoryState(historyStack[++historyIndex]);
+      return true;
+    }
+
+    function replaceSelection(text) {
+      pushHistory(true);
+      editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, 'end');
+      documentChanged();
+      pushHistory(true);
     }
 
     pushHistory(true);
-
-    function updateStats() {
-      const text = getNormalizedText();
-      const words = text.trim() ? text.trim().split(/\s+/).filter(Boolean).length : 0;
-      const chars = text.length;
-      stats.textContent = `${words} word${words === 1 ? '' : 's'} · ${chars} char${chars === 1 ? '' : 's'}`;
-    }
 
     function saveContent(immediate = false) {
       if (saveTimeout) clearTimeout(saveTimeout);
@@ -1370,8 +1257,7 @@
       const doSave = () => {
         saveTimeout = null;
         try {
-          const raw = editor.innerText.replace(/\r\n/g, '\n');
-          localStorage.setItem(STORAGE_KEY, (raw === '' || raw === '\n') ? '' : editor.innerText);
+          localStorage.setItem(STORAGE_KEY, editor.value);
           noteDirty = false;
           noteWriteFailed = false;
           setSaveStatus('Saved', 'saved');
@@ -1385,24 +1271,25 @@
       immediate ? doSave() : (saveTimeout = setTimeout(doSave, 250));
     }
 
+    editor.addEventListener('beforeinput', (e) => {
+      if (e.inputType === 'historyUndo' || e.inputType === 'historyRedo') {
+        e.preventDefault();
+        e.inputType === 'historyUndo' ? undo() : redo();
+      } else if (pendingHistory === null) {
+        // Preserve the selection before the first edit in a typing group.
+        pushHistory(true);
+      }
+    });
+
     editor.addEventListener('input', () => {
-      noteDirty = true;
-      checkEmptyState();
-      saveContent();
-      updateStats();
-      pushHistory(false);
+      documentChanged();
+      pushHistory();
     });
 
     editor.addEventListener('keydown', (e) => {
       if (e.key === 'Tab') {
         e.preventDefault();
-        pushHistory(true);
-        document.execCommand?.('insertText', false, '    ');
-        noteDirty = true;
-        checkEmptyState();
-        saveContent();
-        updateStats();
-        pushHistory(true);
+        replaceSelection('    ');
       }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
         e.preventDefault();
@@ -1412,36 +1299,35 @@
     });
 
     editor.addEventListener('paste', (e) => {
+      if (!e.clipboardData) return;
       e.preventDefault();
-      pushHistory(true);
-      const text = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
-      document.execCommand?.('insertText', false, text);
-      noteDirty = true;
-      checkEmptyState();
-      saveContent();
-      updateStats();
-      pushHistory(true);
+      replaceSelection(e.clipboardData.getData('text/plain'));
     });
+
+    window.addEventListener('resize', refreshEditor);
+    editor.addEventListener('transitionend', refreshEditor);
 
     // Cross-tab sync
     window.addEventListener('storage', (e) => {
-      if (e.key === STORAGE_KEY && !noteReadFailed && !noteWriteFailed && e.newValue !== editor.innerText) {
-        editor.innerText = e.newValue || '';
-        noteDirty = false;
-        checkEmptyState();
-        updateStats();
+      if (e.key === STORAGE_KEY && !noteReadFailed && e.newValue !== editor.value) {
+        if (noteDirty) {
+          showToast('Another tab saved changes. Your unsaved text was kept.');
+        } else {
+          if (paletteBackdrop.classList.contains('open')) closePalette();
+          clearTimeout(saveTimeout);
+          saveTimeout = null;
+          pushHistory(true);
+          editor.value = e.newValue || '';
+          pushHistory(true);
+          noteWriteFailed = false;
+          refreshEditor();
+          setSaveStatus('Saved', 'saved');
+          updateStorageWarning();
+        }
       }
       if (e.key === THEME_KEY && e.newValue !== currentTheme) applyTheme(e.newValue || 'auto');
-      if (e.key === MARGIN_KEY) {
-        document.documentElement.style.setProperty('--margin-slider', e.newValue || '20');
-        marginSlider.value = e.newValue || '20';
-      }
-      if (e.key === FONT_SIZE_KEY) {
-        const sz = e.newValue || '20';
-        document.documentElement.style.setProperty('--font-size', `${sz}px`);
-        fontSizeSlider.value = sz;
-        fontSizeValDisplay.textContent = `${sz}px`;
-      }
+      if (e.key === MARGIN_KEY) applyMargin(e.newValue || '20');
+      if (e.key === FONT_SIZE_KEY) applyFontSize(e.newValue || '20');
     });
 
     window.addEventListener('beforeunload', () => saveContent(true));
@@ -1450,7 +1336,7 @@
     });
 
     function downloadNote() {
-      const blob = new Blob([editor.innerText], { type: 'text/plain;charset=utf-8' });
+      const blob = new Blob([editor.value], { type: 'text/plain;charset=utf-8' });
       const now = new Date();
       const filename = `inka-${now.toISOString().slice(0, 10)}.txt`;
       const a = document.createElement('a');
@@ -1473,69 +1359,45 @@
     if (paletteBtn) paletteBtn.title = `Command Palette (${shortcutLabel})`;
     if (paletteHintText) paletteHintText.textContent = shortcutLabel;
 
-    let savedSelectionRange = null;
-    let savedSelectedText = '';
+    let savedSelection = null;
     let activePaletteIndex = 0;
     let filteredTools = [];
 
     function saveSelection() {
-      const sel = window.getSelection?.();
-      if (sel && sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
-        if (range && editor && (editor === range.commonAncestorContainer || editor.contains?.(range.commonAncestorContainer))) {
-          savedSelectionRange = range.cloneRange ? range.cloneRange() : range;
-          if (range.collapsed) {
-            savedSelectedText = '';
-            return '';
-          }
-          let text = '';
-          const rText = range.toString?.();
-          if (rText && !rText.startsWith('[object ')) text = rText;
-          if (!text) {
-            const sText = sel.toString?.();
-            if (sText && !sText.startsWith('[object ')) text = sText;
-          }
-          if (!text && range.cloneContents && document.createElement) {
-            try {
-              const div = document.createElement('div');
-              div.appendChild(range.cloneContents());
-              if (div.innerText && !div.innerText.startsWith('[object ')) text = div.innerText;
-            } catch (_) {}
-          }
-          savedSelectedText = text.replace(/\r\n/g, '\n');
-          return savedSelectedText;
-        }
-      }
-      if (editor && document.createRange) {
-        const range = document.createRange();
-        range.selectNodeContents(editor);
-        range.collapse(false);
-        range.collapsed = true;
-        savedSelectionRange = range;
-      } else {
-        savedSelectionRange = null;
-      }
-      savedSelectedText = '';
-      return '';
+      savedSelection = {
+        start: editor.selectionStart,
+        end: editor.selectionEnd,
+        direction: editor.selectionDirection
+      };
+      return editor.value.slice(savedSelection.start, savedSelection.end);
     }
 
     function restoreSelection() {
-      editor?.focus?.();
-      if (savedSelectionRange && window.getSelection) {
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(savedSelectionRange);
+      editor.focus();
+      if (savedSelection) {
+        editor.setSelectionRange(savedSelection.start, savedSelection.end, savedSelection.direction);
       }
     }
 
     const lineMap = (fn) => (text) => fn(text.split('\n')).join('\n');
     const parseRadix = (str, radix, prefix) => {
       const trimmed = str.trim();
-      const clean = prefix && (trimmed.toLowerCase().startsWith(prefix.toLowerCase())) ? trimmed.slice(prefix.length) : trimmed;
-      const n = parseInt(clean, radix);
-      if (isNaN(n)) throw new Error('Invalid number');
-      return n;
+      const negative = trimmed.startsWith('-');
+      const unsigned = trimmed.replace(/^[+-]/, '');
+      const digits = prefix && unsigned.toLowerCase().startsWith(prefix)
+        ? unsigned.slice(prefix.length) : unsigned;
+      const validDigits = { 2: /^[01]+$/, 10: /^[0-9]+$/, 16: /^[0-9a-f]+$/i };
+      if (!validDigits[radix].test(digits)) throw new Error('Invalid number');
+      const value = BigInt(`${prefix || ''}${digits}`);
+      return negative ? -value : value;
     };
+    const formatRadix = (value, radix, prefix) =>
+      `${value < 0n ? '-' : ''}${prefix}${(value < 0n ? -value : value).toString(radix).toUpperCase()}`;
+    const caseWords = (text) => (text
+      .replace(/(\p{Lu}+)(\p{Lu}\p{Ll})/gu, '$1 $2')
+      .replace(/([\p{Ll}\p{N}]\p{M}*)(\p{Lu})/gu, '$1 $2')
+      .match(/[\p{L}\p{N}][\p{L}\p{N}\p{M}]*/gu) || [])
+      .map((word) => word.toLowerCase());
 
     const TOOLS = [
       { id: 'json-prettify', title: 'JSON Prettify', desc: 'Format JSON with 2-space indentation', keywords: 'json format pretty beautify indent', icon: '{}', run: (t) => JSON.stringify(JSON.parse(t), null, 2) },
@@ -1585,13 +1447,13 @@
           return Math.floor(ms / 1000).toString();
         }
       },
-      { id: 'dec-to-hex', title: 'Decimal to Hex', desc: 'e.g. 255 → 0xFF', keywords: 'dec decimal hex hexadecimal base convert', icon: '0x', run: (t) => `0x${parseRadix(t, 10).toString(16).toUpperCase()}` },
+      { id: 'dec-to-hex', title: 'Decimal to Hex', desc: 'e.g. 255 → 0xFF', keywords: 'dec decimal hex hexadecimal base convert', icon: '0x', run: (t) => formatRadix(parseRadix(t, 10), 16, '0x') },
       { id: 'hex-to-dec', title: 'Hex to Decimal', desc: 'e.g. 0xFF → 255', keywords: 'hex hexadecimal to dec decimal base parse', icon: '10', run: (t) => parseRadix(t, 16, '0x').toString(10) },
-      { id: 'dec-to-bin', title: 'Decimal to Binary', desc: 'e.g. 42 → 0b101010', keywords: 'dec decimal bin binary base convert', icon: '0b', run: (t) => `0b${parseRadix(t, 10).toString(2)}` },
+      { id: 'dec-to-bin', title: 'Decimal to Binary', desc: 'e.g. 42 → 0b101010', keywords: 'dec decimal bin binary base convert', icon: '0b', run: (t) => formatRadix(parseRadix(t, 10), 2, '0b') },
       { id: 'bin-to-dec', title: 'Binary to Decimal', desc: 'e.g. 0b101010 → 42', keywords: 'bin binary to dec decimal base parse', icon: '01', run: (t) => parseRadix(t, 2, '0b').toString(10) },
-      { id: 'case-camel', title: 'Transform to camelCase', desc: 'e.g. inkaAppNotes', keywords: 'case camel camelCase string transform', icon: 'aB', run: (t) => t.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, c) => c.toUpperCase()) },
-      { id: 'case-snake', title: 'Transform to snake_case', desc: 'e.g. inka_app_notes', keywords: 'case snake snake_case string transform', icon: 'a_b', run: (t) => t.replace(/([a-z])([A-Z])/g, '$1_$2').replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase() },
-      { id: 'case-kebab', title: 'Transform to kebab-case', desc: 'e.g. inka-app-notes', keywords: 'case kebab kebab-case slug transform', icon: 'a-b', run: (t) => t.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase() },
+      { id: 'case-camel', title: 'Transform to camelCase', desc: 'e.g. inkaAppNotes', keywords: 'case camel camelCase string transform', icon: 'aB', run: (t) => caseWords(t).map((word, index) => index === 0 ? word : word.replace(/^./u, (c) => c.toUpperCase())).join('') },
+      { id: 'case-snake', title: 'Transform to snake_case', desc: 'e.g. inka_app_notes', keywords: 'case snake snake_case string transform', icon: 'a_b', run: (t) => caseWords(t).join('_') },
+      { id: 'case-kebab', title: 'Transform to kebab-case', desc: 'e.g. inka-app-notes', keywords: 'case kebab kebab-case slug transform', icon: 'a-b', run: (t) => caseWords(t).join('-') },
       { id: 'case-title', title: 'Transform to Title Case', desc: 'e.g. Inka App Notes', keywords: 'case title titlecase headline capitalize transform', icon: 'Aa', run: (t) => t.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) },
       { id: 'case-upper', title: 'Transform to UPPERCASE', desc: 'e.g. INKA APP NOTES', keywords: 'case upper uppercase capital', icon: 'AA', run: (t) => t.toUpperCase() },
       { id: 'case-lower', title: 'Transform to lowercase', desc: 'e.g. inka app notes', keywords: 'case lower lowercase small', icon: 'aa', run: (t) => t.toLowerCase() },
@@ -1620,8 +1482,7 @@
           }
           const trimmed = text.trimEnd();
           return `${trimmed}${trimmed.endsWith('=') ? ' ' : ' = '}${val}`;
-        },
-        onError: () => showToast('Invalid input')
+        }
       },
       { id: 'insert-uuid', title: 'Insert UUID v4', desc: 'Generate random UUID v4', keywords: 'uuid guid random id generate insert', icon: 'UUID', allowEmptySelection: true, run: () => crypto.randomUUID() },
       { id: 'insert-epoch', title: 'Insert Current Epoch Timestamp', desc: 'Insert Unix seconds since epoch', keywords: 'now timestamp epoch unix seconds time current insert sec', icon: 'SEC', allowEmptySelection: true, run: () => Math.floor(Date.now() / 1000).toString() },
@@ -1676,65 +1537,31 @@
     }
 
     function closePalette() {
-      paletteBackdrop?.classList?.remove('open');
-      paletteBtn?.setAttribute?.('aria-expanded', 'false');
+      paletteBackdrop.classList.remove('open');
+      paletteBtn.setAttribute('aria-expanded', 'false');
       restoreSelection();
-      savedSelectionRange = null;
-      savedSelectedText = '';
-    }
-
-    function insertTextPreservingLines(text) {
-      if (!text.includes('\n')) {
-        document.execCommand?.('insertText', false, text);
-        return;
-      }
-      const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      const html = text.split('\n').map((line, idx) => {
-        const content = line ? escape(line) : '<br>';
-        return idx === 0 ? content : `<div>${content}</div>`;
-      }).join('');
-      if (!document.execCommand?.('insertHTML', false, html)) {
-        document.execCommand?.('insertText', false, text);
-      }
+      savedSelection = null;
     }
 
     function executeTool(tool) {
-      let selectedText = '';
-      if (savedSelectionRange && !savedSelectionRange.collapsed) {
-        selectedText = savedSelectedText || savedSelectionRange.toString?.() || '';
-      }
-
+      const selectedText = savedSelection
+        ? editor.value.slice(savedSelection.start, savedSelection.end)
+        : '';
       if (!tool.allowEmptySelection && !selectedText) {
+        showToast('Select some text first.');
         closePalette();
         return;
       }
-
-      paletteBackdrop?.classList?.remove('open');
-      paletteBtn?.setAttribute?.('aria-expanded', 'false');
-      restoreSelection();
-      pushHistory(true);
-
+      // Compute before committing an edit: failed tools leave history untouched.
       try {
         const result = tool.run(selectedText);
-        if (typeof result === 'string') {
-          insertTextPreservingLines(result);
-          noteDirty = true;
-          checkEmptyState();
-          saveContent();
-          updateStats();
-          pushHistory(true);
-        }
+        if (typeof result !== 'string') throw new Error('Tool did not return text');
+        closePalette();
+        replaceSelection(result);
       } catch (err) {
-        if (tool.onError) {
-          tool.onError(err);
-        } else {
-          console.warn('Transformation failed:', err);
-        }
+        closePalette();
+        showToast(`Invalid input: ${err.message}`);
       }
-
-      savedSelectionRange = null;
-      savedSelectedText = '';
-      editor?.focus?.();
     }
 
     paletteList?.addEventListener('click', (e) => {
@@ -1799,17 +1626,9 @@
       }
     });
 
-    updateStats();
-    editor?.focus?.();
-
-    if (editor && editor.innerText.length > 0 && document.createRange && window.getSelection) {
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.selectNodeContents(editor);
-      range.collapse(false);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
+    refreshEditor();
+    editor.focus();
+    editor.setSelectionRange(editor.value.length, editor.value.length);
   </script>
   <!-- Cloudflare Web Analytics (only injected when hosted on GitHub Pages) -->
   <script>
